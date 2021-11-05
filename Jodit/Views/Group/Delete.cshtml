@@ -1,0 +1,25 @@
+@model Jodit.Models.Group
+@{
+    ViewBag.Title = "User deletion";
+}
+
+<div>
+    <dl class="dl-horizontal">
+        <dt>Group name</dt>
+        <dd>@Html.DisplayFor(model => model.GroupName)</dd>
+
+        <dt>Description</dt>
+        <dd>@Html.DisplayFor(model => model.Description)</dd>
+
+        <dt>Is private</dt>
+        <dd>@Html.DisplayFor(model => model.IsPrivate)</dd>
+    </dl>
+</div>
+
+<div>
+    <form asp-action="delete" asp-controller="Group" method="post">
+        <div class="form-group">
+            <input type="submit" class="btn" value="Delete" />
+        </div>
+    </form>
+</div>

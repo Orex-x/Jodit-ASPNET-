@@ -1,0 +1,42 @@
+@model Jodit.ViewModels.GroupModel
+
+@{
+    ViewData["Title"] = "All groups";
+}
+
+
+<table class="table">
+   <tr>
+       <td>
+           Group name
+       </td>
+       <td>
+           Description
+       </td>
+       <td>
+           Is private
+       </td>
+       <td>
+           Actions
+       </td>
+   </tr>
+    @foreach(var group in Model.Groups)
+    {
+        <tr>
+            <td>
+                @group.GroupName
+            </td>
+            <td>
+                @group.Description
+            </td>
+            <td>
+                @group.IsPrivate
+            </td>
+            <td>
+                <a asp-action="Details" asp-controller="Group" asp-route-id="@group.IdGroup">Open</a>
+                <a asp-action="Edit" asp-controller="Group" asp-route-id="@group.IdGroup">Edit</a>
+                <a asp-action="Delete" asp-controller="Group" asp-route-id="@group.IdGroup">Delete</a>
+            </td>
+        </tr>
+    }
+</table>

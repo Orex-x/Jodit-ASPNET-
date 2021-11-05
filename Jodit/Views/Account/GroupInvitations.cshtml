@@ -1,0 +1,35 @@
+@model Jodit.ViewModels.AccountModel
+ 
+
+@{
+    ViewData["Title"] = "Group invitations";
+}
+
+<table class="table">
+   <tr>
+       <td>
+           Group name
+       </td>
+       <td>
+           Title
+       </td>
+       <td>
+           Inviting user
+       </td>
+   </tr>
+    @foreach(var groupInvite in Model.user.GroupInvitations)
+    {
+        <tr>
+            <td>
+                @groupInvite.Group.GroupName
+            </td>
+            <td>
+                @groupInvite.Title
+            </td>
+            <td>
+                @groupInvite.InvitingUser.FirstName
+            </td>
+          
+        </tr>
+    }
+</table>

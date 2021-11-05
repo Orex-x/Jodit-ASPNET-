@@ -1,0 +1,14 @@
+@model Jodit.Models.UserGroup
+
+@{
+    ViewData["Title"] = "Details";
+}
+<h1>@Model.Group.GroupName</h1>
+<a asp-action="ListUsers" asp-route-id="@Model.Group.IdGroup" asp-controller="User">Users list</a><br>
+
+@{
+    if (Model.IsAdmin)
+    {
+        <a asp-action="InviteUser" asp-controller="User" asp-route-id="@Model.Group.IdGroup">Invite user</a><br>
+    }
+}

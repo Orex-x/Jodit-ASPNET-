@@ -1,0 +1,34 @@
+@model Jodit.ViewModels.UserModel
+
+@{
+    ViewData["Title"] = "All groups";
+}
+
+
+<table class="table">
+    <tr>
+        <td>
+            Name
+        </td>
+        <td>
+            Email
+        </td>
+        <td>
+            Phone
+        </td>
+    </tr>
+    @foreach(var user in Model.Users)
+    {
+        <tr>
+            <td>
+                @user.FirstName @user.SecondName 
+            </td>
+            <td>
+                @user.Email
+            </td>
+            <td>
+                @user.Phone
+            </td>
+        </tr>
+    }
+</table>

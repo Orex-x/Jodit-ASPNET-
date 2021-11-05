@@ -1,0 +1,137 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Jodit.Models;
+using Jodit.ViewModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace Jodit.Controllers
+{
+     public class AccountController : Controller
+    {
+        private ApplicationContext db;
+        public AccountController(ApplicationContext context)
+        {
+            db = context;
+        }
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                User user = await db.Users.FirstOrDefaultAsync
+                    (u => u.Email == model.Email && u.UserPassword == model.Password);
+                if (user != null)
+                {
+                    await Authenticate(model.Email); // аутентификация
+ 
+                    return RedirectToAction("Index", "Home");
+                }
+                ModelState.AddModelError("", "Некорректные логин и(или) пароль");
+            }
+            return View(model);
+        }
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                User user = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+                
+                if (user == null)
+                {
+                    // добавляем пользователя в бд
+                    db.Users.Add(new User {
+                     FirstName = model.FirstName,
+                     SecondName = model.SecondName,
+                     LastName = model.LastName,
+                     Login = model.Login,
+                     Phone = model.Phone,
+                     Email = model.Email, 
+                     UserPassword = model.Password
+                    });
+                    await db.SaveChangesAsync();
+ 
+                    await Authenticate(model.Email); // аутентификация
+ 
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                    ModelState.AddModelError("", "Некорректные логин и(или) пароль");
+            }
+            return View(model);
+        }
+ 
+        private async Task Authenticate(string userName)
+        {
+            // создаем один claim
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
+            };
+            // создаем объект ClaimsIdentity
+            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie",
+                ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+            // установка аутентификационных куки
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+        }
+        
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Account");
+        }
+        
+        [Authorize]
+        public IActionResult Account()
+        {
+            var userName = User.Identity.Name;
+            User user = db.Users.Where(i => i.Email == userName).FirstOrDefault();
+            
+            AccountModel model = new AccountModel()
+            {
+                user = user
+            };
+            return View(model);
+        }
+        
+        
+        public IActionResult GroupInvitations()
+        {
+            var userName = User.Identity.Name;
+            User user = db.Users.Where(i => i.Email == userName).FirstOrDefault();
+            
+           
+           var groupInvites = db.GroupInvites
+               .Include(u => u.Group)  // подгружаем данные по компаниям
+               .Include(c => c.InvitingUser)
+               .Where(c => c.InvitedUserId == user.IdUser)// к компаниям подгружаем данные по странам
+               .ToList();
+           
+           user.GroupInvitations = groupInvites;
+           AccountModel model = new AccountModel()
+            {
+                user = user
+            };
+            return View(model);
+        } 
+    }
+}
