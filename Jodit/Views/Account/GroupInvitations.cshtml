@@ -6,17 +6,20 @@
 }
 
 <table class="table">
-   <tr>
-       <td>
-           Group name
-       </td>
-       <td>
-           Title
-       </td>
-       <td>
-           Inviting user
-       </td>
-   </tr>
+    <tr>
+        <td>
+            Group name
+        </td>
+        <td>
+            Title
+        </td>
+        <td>
+            Inviting user
+        </td>
+        <td>
+            Actions
+        </td>
+    </tr>
     @foreach(var groupInvite in Model.user.GroupInvitations)
     {
         <tr>
@@ -28,6 +31,12 @@
             </td>
             <td>
                 @groupInvite.InvitingUser.FirstName
+            </td>
+            <td>
+                <a asp-action="AcceptGroupInvitations" asp-route-idGroupInvitations="@groupInvite.IdGroupInvite" asp-controller="Account">Accept</a>
+            </td>
+            <td>
+                <a asp-action="RefuseGroupInvitations" asp-route-idGroupInvitations="@groupInvite.IdGroupInvite" asp-controller="Account">Refuse</a>
             </td>
           
         </tr>

@@ -32,9 +32,14 @@
             <td>
                 @user.Phone
             </td>
-             <td>
-                 <a asp-action="InviteUserFinal" asp-controller="User" asp-route-idUser="@user.IdUser" asp-route-idGroup="@Model.Group.IdGroup">Invite</a>
-                 </td>
+            <td>
+                @{
+                    if (Model.User.IdUser != user.IdUser)
+                    {
+                        <a asp-action="InviteUserFinal" asp-controller="User" asp-route-idUser="@user.IdUser" asp-route-idGroup="@Model.Group.IdGroup">Invite</a>
+                    }
+                }
+            </td>
         </tr>
     }
 </table>

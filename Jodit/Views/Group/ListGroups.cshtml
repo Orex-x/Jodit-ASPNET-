@@ -6,36 +6,45 @@
 
 
 <table class="table">
-   <tr>
-       <td>
-           Group name
-       </td>
-       <td>
-           Description
-       </td>
-       <td>
-           Is private
-       </td>
-       <td>
-           Actions
-       </td>
-   </tr>
-    @foreach(var group in Model.Groups)
+    <tr>
+        <td>
+            Group name
+        </td>
+        <td>
+            Description
+        </td>
+        <td>
+            Is private
+        </td>
+        <td>
+            Actions
+        </td>
+    </tr>
+    @foreach(var userGroup in Model.UserGroups)
     {
         <tr>
             <td>
-                @group.GroupName
+                @userGroup.Group.GroupName
             </td>
             <td>
-                @group.Description
+                @userGroup.Group.Description
             </td>
             <td>
-                @group.IsPrivate
+                @userGroup.Group.IsPrivate
             </td>
             <td>
-                <a asp-action="Details" asp-controller="Group" asp-route-id="@group.IdGroup">Open</a>
-                <a asp-action="Edit" asp-controller="Group" asp-route-id="@group.IdGroup">Edit</a>
-                <a asp-action="Delete" asp-controller="Group" asp-route-id="@group.IdGroup">Delete</a>
+                <a asp-action="Details" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup">Open</a>
+                @{
+                    if (userGroup.IsAdmin)
+                    {
+                        <a asp-action="Edit" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup">Edit</a>
+                        <a asp-action="Delete" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup">Delete</a>
+                    }
+                    else
+                    {
+                        <a asp-action="LeaveGroup" asp-controller="Group" asp-route-idUserGroup="@userGroup.IdUserGroup">Leave</a>
+                    }
+                }
             </td>
         </tr>
     }

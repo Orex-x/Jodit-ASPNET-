@@ -22,7 +22,7 @@ namespace Jodit.Controllers
         public IActionResult ListGroups()
         {
             
-            var userName = User.Identity.Name;
+            /*var userName = User.Identity.Name;
             User user = db.Users.Where(i => i.Email == userName).FirstOrDefault();
 
             
@@ -34,8 +34,19 @@ namespace Jodit.Controllers
             GroupModel accountModel = new GroupModel
            {
                Groups = user.Groups
-           };
-           return View(accountModel);
+           };*/
+            var userName = User.Identity.Name;
+                User user = db.Users.FirstOrDefault(i => i.Email == userName);
+                var userGroups = db.UserGroups
+                    .Include(g => g.Group)
+                    .Where(i => i.UserId == user.IdUser).ToList();
+                
+                
+            GroupModel accountModel = new GroupModel
+            {
+                UserGroups = userGroups
+            };
+            return View(accountModel);
             
         }
 
@@ -46,7 +57,7 @@ namespace Jodit.Controllers
          {
              group.DateOfCreation = DateTime.Today;
              var userName = User.Identity.Name;
-             User user = db.Users.Where(i => i.Email == userName).FirstOrDefault();
+             User user = db.Users.FirstOrDefault(i => i.Email == userName);
              
              db.Groups.Add(group);
              if (user != null)
@@ -63,7 +74,7 @@ namespace Jodit.Controllers
              if (id != null)
              {
                  var userName = User.Identity.Name;
-                 User user = db.Users.Where(i => i.Email == userName).FirstOrDefault();
+                 User user = db.Users.FirstOrDefault(i => i.Email == userName);
                  await db.Groups.Where(gr => gr.IdGroup == id).FirstOrDefaultAsync();
                  var userGroup = await db.UserGroups
                      .Where(i => i.GroupId == id)
@@ -77,6 +88,30 @@ namespace Jodit.Controllers
              return NotFound();
          }
          
+         
+         public async Task<IActionResult> LeaveGroup(int? idUserGroup)
+         {
+             if (idUserGroup != null)
+             {
+                 var userGroup = await db.UserGroups.FirstOrDefaultAsync(i => i.IdUserGroup == idUserGroup);
+
+                 if (userGroup != null)
+                 {
+                     db.Entry(userGroup)
+                         .Reference(c => c.Group)
+                         .Load();
+            
+                     db.Entry(userGroup)
+                         .Reference(c => c.User)
+                         .Load();
+
+                     db.UserGroups.Remove(userGroup);
+                     await db.SaveChangesAsync();
+                     return RedirectToAction("ListGroups", "Group");
+                 }
+             }
+             return NotFound();
+         }
          
          
          public async Task<IActionResult> Edit(int? id)

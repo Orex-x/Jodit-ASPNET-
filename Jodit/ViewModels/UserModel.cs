@@ -7,6 +7,7 @@ namespace Jodit.ViewModels
     {
         public IEnumerable<User> Users { get; set; }
         
+        public User User { get; set; }
         public Group Group { get; set; }
     }
 }

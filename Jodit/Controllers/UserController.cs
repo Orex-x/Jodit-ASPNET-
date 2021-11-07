@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Jodit.Models;
 using Jodit.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Npgsql;
 
 namespace Jodit.Controllers
 {
@@ -33,11 +34,14 @@ namespace Jodit.Controllers
          [HttpGet]
          public IActionResult InviteUser(int id)
          {
+             var userName = User.Identity.Name;
+             User user = db.Users.FirstOrDefault(i => i.Email == userName);
              Group group = db.Groups.FirstOrDefault(i => i.IdGroup == id);
              UserModel model = new UserModel
              {
                  Users = db.Users,
-                 Group = group
+                 Group = group,
+                 User = user
              };
              return View(model);
          }
@@ -50,7 +54,12 @@ namespace Jodit.Controllers
              User invitedUser = db.Users.FirstOrDefault(i => i.IdUser == idUser);   
              Group group = db.Groups.FirstOrDefault(i => i.IdGroup == idGroup);
              
-             if (invitingUser != null && invitedUser != null && group != null)
+             var foo = db.GroupInvites
+                 .Where(us => us.InvitedUser.IdUser == invitedUser.IdUser)
+                 .Where(us => us.InvitingUser.IdUser == invitingUser.IdUser)
+                 .FirstOrDefault(gr => gr.GroupId == group.IdGroup);
+             
+             if (invitingUser != null && invitedUser != null && group != null && foo == null)
              {
                  invitingUser.GroupApplications.Add(new GroupInvite
                  {
@@ -58,8 +67,8 @@ namespace Jodit.Controllers
                      InvitingUser = invitingUser, 
                      Title = "Вступай в группу"
                  });
+                 await db.SaveChangesAsync();
              }
-             await db.SaveChangesAsync();
              return RedirectToAction("ListGroups", "Group");
          }
     }
