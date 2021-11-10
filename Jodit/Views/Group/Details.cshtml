@@ -1,14 +1,41 @@
+@using System.Collections
 @model Jodit.Models.UserGroup
 
 @{
     ViewData["Title"] = "Details";
 }
 <h1>@Model.Group.GroupName</h1>
-<a asp-action="ListUsers" asp-route-id="@Model.Group.IdGroup" asp-controller="User">Users list</a><br>
 
-@{
+
+<br><a asp-action="ListUsers" asp-route-id="@Model.Group.IdGroup" asp-controller="User">Users list</a><br>
+
+
+<br>@{
     if (Model.IsAdmin)
     {
         <a asp-action="InviteUser" asp-controller="User" asp-route-id="@Model.Group.IdGroup">Invite user</a><br>
+    }
+    }
+
+
+
+<form>
+    <div>
+        <label for="date">Enter date:</label>
+        <input type="date" id="date" name="date">
+    </div>
+    <div>
+        <input type="submit">
+    </div>
+</form>
+<br>
+<h6>@ViewData["ResultCalculateByDate"]</h6>
+
+<br><br><h3>Дежурства на 30 дней вперед</h3>
+@{
+    ArrayList list = Model.Group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+    foreach (var str in list)
+    {
+        <h6>@str</h6><br>
     }
 }

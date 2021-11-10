@@ -18,6 +18,7 @@ namespace Jodit.Controllers
          public IActionResult ListUsers(int id)
          {
              Group group = db.Groups.FirstOrDefault(i => i.IdGroup == id);
+             
              db.Entry(group)
                 .Collection(c => c.Users)
                 .Load();

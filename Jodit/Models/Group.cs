@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -31,6 +32,40 @@ namespace Jodit.Models
         [InverseProperty("Group")]
          public List<GroupInvite> GroupInvites { get; set; }  = new List<GroupInvite>();
 
+         
+         
+         public ArrayList CalculateToDate(DateTime date)
+         {
+             ArrayList list = new ArrayList();
+             DateTime now = DateTime.Now.Date;
+             while (now != date)
+             {
+                 var i = Calculate(now);
+                 User user = Users[i];
+                 list.Add("Date: " + now.ToShortDateString() + " user: " + user.FirstName + " " + user.SecondName);
+                 now = now.AddDays(1);
+             }
+             return list;
+         }
+
+         public string CalculateByDate(DateTime date)
+         {
+             var i = Calculate(date);
+             User user = Users[i];
+             return "Date: " + date.ToShortDateString() + " user: " + user.FirstName + " " + user.SecondName;
+         }
         
+         public int Calculate(DateTime date)
+         {
+             // Считаю разницу в днях 
+             var a = (int) (date - DateOfCreation).TotalDays;
+             // Считаю n полных циклов дежурств прошло с момента создания группы
+             var b = a / Users.Count;
+             // Считаю количесвто дней, необходимых для прохождения n полных циклов
+             var c = b * Users.Count;
+             //нахожу разницу
+             var d = a - c;
+             return d;
+         }
     }
 }

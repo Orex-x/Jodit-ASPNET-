@@ -16,25 +16,8 @@ namespace Jodit.Controllers
             db = context;
         }
         
-        
-       
-
         public IActionResult ListGroups()
         {
-            
-            /*var userName = User.Identity.Name;
-            User user = db.Users.Where(i => i.Email == userName).FirstOrDefault();
-
-            
-            // Загрузить связанные с ним заказы с помощью явной загрузки
-            db.Entry(user)
-                .Collection(c => c.Groups)
-                .Load();
-            
-            GroupModel accountModel = new GroupModel
-           {
-               Groups = user.Groups
-           };*/
             var userName = User.Identity.Name;
                 User user = db.Users.FirstOrDefault(i => i.Email == userName);
                 var userGroups = db.UserGroups
@@ -69,19 +52,29 @@ namespace Jodit.Controllers
               return RedirectToAction("ListGroups", "Group");
          }
          
-         public async Task<IActionResult> Details(int? id)
+         public async Task<IActionResult> Details(int? id, DateTime date)
          {
              if (id != null)
              {
                  var userName = User.Identity.Name;
                  User user = db.Users.FirstOrDefault(i => i.Email == userName);
-                 await db.Groups.Where(gr => gr.IdGroup == id).FirstOrDefaultAsync();
+                 Group group = await db.Groups.FirstOrDefaultAsync(gr => gr.IdGroup == id);
+
+                 db.Entry(group)
+                     .Collection(c => c.Users)
+                     .Load();
+
                  var userGroup = await db.UserGroups
                      .Where(i => i.GroupId == id)
                      .FirstOrDefaultAsync(i => i.UserId == user.IdUser);
-
+                 
                  if (userGroup != null)
                  {
+                     
+                     if (date.Date != DateTime.MinValue)
+                     {
+                         ViewData["ResultCalculateByDate"] = group.CalculateByDate(date.Date);
+                     }
                      return View(userGroup);
                  }
              }
