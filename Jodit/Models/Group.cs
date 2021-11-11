@@ -31,8 +31,10 @@ namespace Jodit.Models
         
         [InverseProperty("Group")]
          public List<GroupInvite> GroupInvites { get; set; }  = new List<GroupInvite>();
-
          
+         [InverseProperty("Group")]
+         public List<UserMission> UserMissions { get; set; }  = new List<UserMission>();
+
          
          public ArrayList CalculateToDate(DateTime date)
          {

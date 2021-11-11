@@ -51,6 +51,10 @@ namespace Jodit.Models
         public DbSet<UserGroup> UserGroups { get; set; }
         
         public DbSet<GroupInvite> GroupInvites { get; set; }
+        
+        public DbSet<Mission> Missions { get; set; }
+        
+        public DbSet<UserMission> UserMissions { get; set; }
 
     }
 }

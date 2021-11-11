@@ -1,0 +1,39 @@
+@model Jodit.ViewModels.MissionModel 
+ 
+<h2>My missions</h2>
+
+
+<table class="table">
+    <tr>
+        <td>
+            Title
+        </td>
+        <td>
+            Description
+        </td>
+        <td>
+            Deadline
+        </td>
+        <td>
+            Info
+        </td>
+    </tr>
+    @foreach(var mission in Model.UserMissions)
+    {
+        <tr>
+            <td>
+                @mission.Mission.Title
+            </td>
+            <td>
+                @mission.Mission.Description
+            </td>
+            <td>
+                @mission.Mission.Deadline
+            </td>
+            <td>
+                Author: @mission.Author.FirstName @mission.Author.SecondName
+                Group: @mission.Group.GroupName
+            </td>
+        </tr>
+    }
+</table>

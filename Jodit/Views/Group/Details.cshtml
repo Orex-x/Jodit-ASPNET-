@@ -10,12 +10,21 @@
 <br><a asp-action="ListUsers" asp-route-id="@Model.Group.IdGroup" asp-controller="User">Users list</a><br>
 
 
-<br>@{
+<br>
+@{
+    if (Model.IsAdmin)
+    {
+        <a asp-action="CreateMission" asp-route-id="@Model.Group.IdGroup" asp-controller="Mission">Create task</a><br>
+    }
+}
+
+<br>
+@{
     if (Model.IsAdmin)
     {
         <a asp-action="InviteUser" asp-controller="User" asp-route-id="@Model.Group.IdGroup">Invite user</a><br>
     }
-    }
+}
 
 
 

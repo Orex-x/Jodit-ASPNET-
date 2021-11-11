@@ -42,17 +42,24 @@ namespace Jodit.Models
         
         
         
+        // UserGroup
         public List<Group> Groups { get; set; } = new List<Group>();
         public List<UserGroup> UserGroups { get; set; } = new List<UserGroup>();
         
         
-        
+        // GroupInvite
         [InverseProperty("InvitedUser")]
         public List<GroupInvite> GroupInvitations { get; set; } = new List<GroupInvite>();
         
         [InverseProperty("InvitingUser")]
         public List<GroupInvite> GroupApplications { get; set; } = new List<GroupInvite>();
         
-
+        
+        // UserJoditTask
+        [InverseProperty("Author")]
+        public List<UserMission> Authors { get; set; } = new List<UserMission>();
+        
+        [InverseProperty("Executor")]
+        public List<UserMission> Executors { get; set; } = new List<UserMission>();
     }
 }

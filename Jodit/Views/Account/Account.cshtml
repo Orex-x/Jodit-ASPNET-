@@ -8,7 +8,8 @@
 <h2>@Model.user.FirstName @Model.user.SecondName @Model.user.LastName </h2>
 <a asp-action="ListGroups" asp-controller="Group">Group list</a><br>
 <a asp-action="createGroup" asp-controller="Group">Add group</a><br>
-<a asp-action="GroupInvitations" asp-controller="Account">My invitations</a>
+<a asp-action="GroupInvitations" asp-controller="Account">My invitations</a><br>
+<a asp-action="ListMissions" asp-controller="Mission">My missions</a>
 <form asp-action="Logout" asp-controller="Account" asp-anti-forgery="true">
     <div>
         <input type="submit" value="Выйти" />
