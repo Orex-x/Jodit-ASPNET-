@@ -27,5 +27,8 @@ namespace Jodit.Models
         [Column("mission_id")]
         public int MissionId { get; set; }
         public Mission Mission { get; set; }
+        
+        [Column("status")]
+        public string Status { get; set; }
     }
 }

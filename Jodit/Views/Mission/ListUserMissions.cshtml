@@ -1,0 +1,40 @@
+@model List<UserMission>
+
+@{
+    ViewData["Title"] = "All groups";
+}
+
+
+<table class="table">
+    <tr>
+        <td>
+            Name
+        </td>
+        <td>
+            Email
+        </td>
+        <td>
+            Phone
+        </td>
+        <td>
+            Status
+        </td>
+    </tr>
+    @foreach(var userMission in Model)
+    {
+        <tr>
+            <td>
+                @userMission.Executor.FirstName @userMission.Executor.SecondName 
+            </td>
+            <td>
+                @userMission.Executor.Email
+            </td>
+            <td>
+                @userMission.Executor.Phone
+            </td>
+            <td>
+                @userMission.Status
+            </td>
+        </tr>
+    }
+</table>

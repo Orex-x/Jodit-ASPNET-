@@ -1,7 +1,6 @@
+@using Jodit.Controllers
 @model Jodit.ViewModels.MissionModel 
  
-<h2>My missions</h2>
-
 
 <table class="table">
     <tr>
@@ -15,25 +14,96 @@
             Deadline
         </td>
         <td>
+            Action
+        </td>
+        <td>
             Info
         </td>
     </tr>
-    @foreach(var mission in Model.UserMissions)
+    
+    <tr>
+        <h2>Pending Missions</h2>
+    </tr>
+    @foreach(var userMission in Model.executorsMissions)
     {
-        <tr>
-            <td>
-                @mission.Mission.Title
-            </td>
-            <td>
-                @mission.Mission.Description
-            </td>
-            <td>
-                @mission.Mission.Deadline
-            </td>
-            <td>
-                Author: @mission.Author.FirstName @mission.Author.SecondName
-                Group: @mission.Group.GroupName
-            </td>
-        </tr>
+        @if (userMission.Status.Equals(MissionController.STATUS.PENDING.ToString()))
+        {
+            <tr>
+                <td>
+                    @userMission.Mission.Title
+                </td>
+                <td>
+                    @userMission.Mission.Description
+                </td>
+                <td>
+                    @userMission.Mission.Deadline
+                </td>
+                <td>
+                    <a asp-action="TakeMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">take</a><br>
+                    <a asp-action="RefuseMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">refuse</a><br>
+                </td>
+                <td>
+                    Author @userMission.Author.FirstName @userMission.Author.SecondName
+                    from the group @userMission.Group.GroupName
+                    <a asp-action="ListExecutors" asp-route-id="@userMission.MissionId" asp-controller="Mission">list executors</a><br>
+                </td>
+            </tr>
+        }
     }
+    <tr>
+        <h2>Take Missions</h2>
+    </tr>
+    @foreach(var userMission in Model.executorsMissions)
+    {
+        @if (userMission.Status.Equals(MissionController.STATUS.TAKE.ToString()))
+        {
+            <tr>
+                <td>
+                    @userMission.Mission.Title
+                </td>
+                <td>
+                    @userMission.Mission.Description
+                </td>
+                <td>
+                    @userMission.Mission.Deadline
+                </td>
+                <td>
+                    <a asp-action="PassMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">Pass</a><br>
+                </td>
+                <td>
+                    Author @userMission.Author.FirstName @userMission.Author.SecondName
+                    from the group @userMission.Group.GroupName
+                    <a asp-action="ListExecutors" asp-route-id="@userMission.MissionId" asp-controller="Mission">list executors</a><br>
+                </td>
+            </tr>
+        }
+    }
+    <tr>
+        <h2>Authors Missions</h2>
+    </tr>
+     @foreach (var userMission in Model.authorsMissions)
+     {
+         <tr>
+             <td>
+                 @userMission.Mission.Title
+             </td>
+             <td>
+                 @userMission.Mission.Description
+             </td>
+             <td>
+                 @userMission.Mission.Deadline
+             </td>
+             <td>
+                 @if (userMission.Status.Equals(MissionController.STATUS.PASS.ToString()))
+                 {
+                     <a asp-action="deleteMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">accept</a><br>
+                     <a asp-action="returnMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">return</a><br>
+                 }
+                 <a asp-action="deleteMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">delete</a><br>
+             </td>
+             <td>
+                 <a asp-action="ListUserMissions" asp-route-id="@userMission.MissionId" asp-controller="Mission">list executors</a><br>
+             </td>
+         </tr>
+     }
 </table>

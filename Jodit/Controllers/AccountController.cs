@@ -72,7 +72,7 @@ namespace Jodit.Controllers
  
                     await Authenticate(model.Email); // аутентификация
  
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Account", "Account");
                 }
                 else
                     ModelState.AddModelError("", "Некорректные логин и(или) пароль");
