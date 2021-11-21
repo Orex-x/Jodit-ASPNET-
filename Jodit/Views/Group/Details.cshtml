@@ -1,32 +1,33 @@
-@using System.Collections
-@model Jodit.Models.UserGroup
+@model Jodit.ViewModels.GroupDetailsModel
 
 @{
     ViewData["Title"] = "Details";
 }
-<h1>@Model.Group.GroupName</h1>
+<h1>@Model.UserGroup.Group.GroupName</h1>
 
 
-<br><a asp-action="ListUsers" asp-route-id="@Model.Group.IdGroup" asp-controller="User">Users list</a><br>
+<br><a asp-action="ListUsers" asp-route-id="@Model.UserGroup.Group.IdGroup" asp-controller="User">Users list</a><br>
 
 
 <br>
 @{
-    if (Model.IsAdmin)
+    if (Model.UserGroup.IsAdmin)
     {
-        <a asp-action="CreateMission" asp-route-id="@Model.Group.IdGroup" asp-controller="Mission">Create task</a><br>
+        <a asp-action="CreateMission" asp-route-id="@Model.UserGroup.Group.IdGroup" asp-controller="Mission">Create task</a><br>
     }
 }
 
 <br>
 @{
-    if (Model.IsAdmin)
+    if (Model.UserGroup.IsAdmin)
     {
-        <a asp-action="InviteUser" asp-controller="User" asp-route-id="@Model.Group.IdGroup">Invite user</a><br>
+        <a asp-action="InviteUser" asp-controller="User" asp-route-id="@Model.UserGroup.Group.IdGroup">Invite user</a><br>
     }
 }
 
+<a asp-action="CreateStatement" asp-route-id="@Model.UserGroup.Group.IdGroup" asp-controller="Group">will change</a><br>
 
+<a asp-action="ListScheduleStatement" asp-route-id="@Model.UserGroup.Group.IdGroup" asp-controller="Group">list change</a><br>
 
 <form>
     <div>
@@ -42,9 +43,29 @@
 
 <br><br><h3>Дежурства на 30 дней вперед</h3>
 @{
-    ArrayList list = Model.Group.CalculateToDate(DateTime.Now.Date.AddDays(30));
-    foreach (var str in list)
+    Dictionary<DateTime, User> list = Model.UserGroup.Group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+    foreach (var item in list)
     {
-        <h6>@str</h6><br>
+        var a = Model.ScheduleChanges.FirstOrDefault(x => x.AfterUserDate == item.Key);
+        var b = Model.ScheduleChanges.FirstOrDefault(x => x.BeforeUserDate == item.Key);
+        
+        if (a != null)
+        {
+            <h6>
+                Date: @item.Key.ToShortDateString()
+                user: @a.BeforeUser.FirstName @a.BeforeUser.SecondName
+            </h6>
+        }
+        else if (b != null)
+        {
+            <h6>
+                Date: @item.Key.ToShortDateString()
+                user: @b.AfterUser.FirstName @b.AfterUser.SecondName
+            </h6>
+        }
+        else
+        {
+            <h6>Date: @item.Key.ToShortDateString() user: @item.Value.FirstName  @item.Value.SecondName</h6>
+        }
     }
 }

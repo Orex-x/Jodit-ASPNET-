@@ -20,10 +20,6 @@ namespace Jodit.Models
         {
             modelBuilder.UseIdentityColumns();
             //----------------------------------------------------------------------------------------------------------
-            
-            
-            
-            //----------------------------------------------------------------------------------------------------------
             modelBuilder
                 .Entity<Group>()
                 .HasMany(c => c.Users)
@@ -58,6 +54,10 @@ namespace Jodit.Models
         public DbSet<Mission> Missions { get; set; }
         
         public DbSet<UserMission> UserMissions { get; set; }
+        
+        public DbSet<ScheduleChange> ScheduleChanges { get; set; }
+        
+        public DbSet<ScheduleStatement> ScheduleStatements { get; set; }
 
     }
 }

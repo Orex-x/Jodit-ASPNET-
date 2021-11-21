@@ -1,0 +1,34 @@
+@model List<ScheduleStatement>
+
+<table class="table">
+    <tr>
+        <td>
+            Comment
+        </td>
+        <td>
+            ReplacementDate
+        </td>
+        <td>
+            Action
+        </td>
+      
+    </tr>
+    @foreach(var statement in Model)
+    {
+        <tr>
+            <td>
+                @statement.Comment
+            </td>
+            <td>
+                @statement.ReplacementDate.ToShortDateString()
+            </td>
+          
+            <td>
+                <a asp-action="CreateScheduleChange" asp-route-idGroup="@statement.Group.IdGroup" 
+                   asp-route-idUserBefore="@statement.BeforeUser.IdUser" 
+                   asp-route-idScheduleStatement="@statement.IdScheduleStatement"
+                   asp-controller="Group">Accept</a><br>
+            </td>
+        </tr>
+    }
+</table>

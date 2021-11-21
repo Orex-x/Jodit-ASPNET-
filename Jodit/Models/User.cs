@@ -61,5 +61,19 @@ namespace Jodit.Models
         
         [InverseProperty("Executor")]
         public List<UserMission> Executors { get; set; } = new List<UserMission>();
+        
+        
+        // ScheduleChange
+        [InverseProperty("BeforeUser")]
+        public List<ScheduleChange> ScheduleChangesBeforeUsers { get; set; } = new List<ScheduleChange>();
+        
+        [InverseProperty("AfterUser")]
+        public List<ScheduleChange> ScheduleChangesAfterUsers { get; set; } = new List<ScheduleChange>();
+        
+        
+        // ScheduleStatement
+        [InverseProperty("BeforeUser")]
+        public List<ScheduleStatement> BeforeUsers { get; set; } = new List<ScheduleStatement>();
+   
     }
 }

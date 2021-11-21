@@ -34,27 +34,35 @@ namespace Jodit.Models
          
          [InverseProperty("Group")]
          public List<UserMission> UserMissions { get; set; }  = new List<UserMission>();
-
          
-         public ArrayList CalculateToDate(DateTime date)
+         [InverseProperty("Group")]
+         public List<ScheduleChange> ScheduleChanges { get; set; }  = new List<ScheduleChange>();
+         
+         [InverseProperty("Group")]
+         public List<ScheduleStatement> ScheduleStatements { get; set; }  = new List<ScheduleStatement>();
+         
+         
+         public Dictionary<DateTime, User> CalculateToDate(DateTime date)
          {
-             ArrayList list = new ArrayList();
+             Dictionary<DateTime, User> list = new Dictionary<DateTime, User>();
              DateTime now = DateTime.Now.Date;
              while (now != date)
              {
                  var i = Calculate(now);
                  User user = Users[i];
-                 list.Add("Date: " + now.ToShortDateString() + " user: " + user.FirstName + " " + user.SecondName);
+                 //list.Add("Date: " + now.ToShortDateString() + " user: " + user.FirstName + " " + user.SecondName);
+                 list.Add(now, user);
                  now = now.AddDays(1);
              }
              return list;
          }
 
-         public string CalculateByDate(DateTime date)
+         public Dictionary<DateTime, User> CalculateByDate(DateTime date)
          {
              var i = Calculate(date);
              User user = Users[i];
-             return "Date: " + date.ToShortDateString() + " user: " + user.FirstName + " " + user.SecondName;
+             return new Dictionary<DateTime, User> { {date, user} };
+           //  return "Date: " + date.ToShortDateString() + " user: " + user.FirstName + " " + user.SecondName;
          }
         
          public int Calculate(DateTime date)

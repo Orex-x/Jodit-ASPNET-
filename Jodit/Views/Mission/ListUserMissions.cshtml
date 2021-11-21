@@ -1,3 +1,4 @@
+@using Jodit.Controllers
 @model List<UserMission>
 
 @{
@@ -19,6 +20,9 @@
         <td>
             Status
         </td>
+        <td>
+            Actions
+        </td>
     </tr>
     @foreach(var userMission in Model)
     {
@@ -34,6 +38,12 @@
             </td>
             <td>
                 @userMission.Status
+            </td>
+            <td>
+                @if (userMission.Status.Equals(MissionController.STATUS.REFUSE.ToString()))
+                {
+                    <a asp-action="deleteMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">delete</a><br>   
+                }
             </td>
         </tr>
     }

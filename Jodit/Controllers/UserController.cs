@@ -55,12 +55,12 @@ namespace Jodit.Controllers
              User invitedUser = db.Users.FirstOrDefault(i => i.IdUser == idUser);   
              Group group = db.Groups.FirstOrDefault(i => i.IdGroup == idGroup);
              
-             var foo = db.GroupInvites
+             var groupInvite = db.GroupInvites
                  .Where(us => us.InvitedUser.IdUser == invitedUser.IdUser)
                  .Where(us => us.InvitingUser.IdUser == invitingUser.IdUser)
                  .FirstOrDefault(gr => gr.GroupId == group.IdGroup);
              
-             if (invitingUser != null && invitedUser != null && group != null && foo == null)
+             if (invitingUser != null && invitedUser != null && group != null && groupInvite == null)
              {
                  invitingUser.GroupApplications.Add(new GroupInvite
                  {
