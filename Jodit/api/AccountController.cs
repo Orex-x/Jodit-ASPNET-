@@ -22,21 +22,22 @@ namespace Jodit.api
         {
             db = context;
         }
-
-        
         
         [HttpGet]
-                [Route("GetUsers")]
-                public IEnumerable<User> Get(string idSession)
-                {
-                    UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
-                    if (session != null)
-                    {
-                        var users = db.Users.ToList();
-                        return users;
-                    }
-                    return new List<User>();
-                }
+        [Route("GetUser")]
+        public User GetUser(string idSession)
+        {
+            UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
+            if (session != null)
+            {
+                User user = db.Users.FirstOrDefault(i => i.IdUser == session.UserId);
+                return user;
+            }
+            return new User();
+        }
+        
+        
+        
         [HttpGet]
         [Route("GetUserGroup")]
         public IEnumerable<UserGroup> GetUserGroup(string idSession)
@@ -52,61 +53,44 @@ namespace Jodit.api
             }
             return new List<UserGroup>();
         }
-
         
         [HttpDelete]
-        public void Delete(int id)
+        [Route("DeleteUser")]
+        public void Delete(string idSession, int id)
         {
-            var user = db.Users.FirstOrDefault(i => i.IdUser == id);
-            db.Users.Remove(user);
-            db.SaveChanges();
+            UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
+            if (session != null)
+            {
+                var user = db.Users.FirstOrDefault(i => i.IdUser == id);
+                db.Users.Remove(user);
+                db.SaveChanges();
+            }
+        }
+        
+        [HttpDelete]
+        [Route("CloseSession")]
+        public void Delete(string idSession)
+        {
+            UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
+            if (session != null)
+            {
+                db.UserSessions.Remove(session);
+                db.SaveChanges();
+            }
         }
 
         [HttpDelete]
-        public void GroupInvitationsRefuse(int id)
+        [Route("GroupInvitationsRefuseAPI")]
+        public void GroupInvitationsRefuse(string idSession, int id)
         {
-            GroupInvite groupInvite = db.GroupInvites.FirstOrDefault(i => i.IdGroupInvite == id);
-            db.Entry(groupInvite)
-                .Reference(c => c.Group)
-                .Load();
-            
-            db.Entry(groupInvite)
-                .Reference(c => c.InvitingUser)
-                .Load();
-            
-            db.Entry(groupInvite)
-                .Reference(c => c.InvitedUser)
-                .Load();
-
-            if (groupInvite != null)
-            {
-                db.GroupInvites.Remove(groupInvite);
-            }
-            db.SaveChangesAsync();
+           
         }
         
         [HttpPut]
-        public void GroupInvitationsAccept(int id)
+        [Route("GroupInvitationsAcceptAPI")]
+        public void GroupInvitationsAccept(string idSession, int id)
         {
-            GroupInvite groupInvite = db.GroupInvites.FirstOrDefault(i => i.IdGroupInvite == id);
-            db.Entry(groupInvite)
-                .Reference(c => c.Group)
-                .Load();
-            
-            db.Entry(groupInvite)
-                .Reference(c => c.InvitingUser)
-                .Load();
-            
-            db.Entry(groupInvite)
-                .Reference(c => c.InvitedUser)
-                .Load();
-            if (groupInvite != null)
-            {
-                groupInvite.InvitedUser.UserGroups.Add(new UserGroup {Group = groupInvite.Group, 
-                    IsAdmin = false, User = groupInvite.InvitedUser});
-                db.GroupInvites.Remove(groupInvite);
-            }
-            db.SaveChanges();
+           
         }
         
         [HttpPost]
@@ -121,9 +105,6 @@ namespace Jodit.api
             return groupInvites;
         }
 
-
-        
-        
         [HttpPost]
         public int Post([FromBody] RegisterModel model)
         {
@@ -153,7 +134,7 @@ namespace Jodit.api
         
         
         [HttpPost]
-        [Route("Login")]
+        [Route("LoginAPI")]
         public string Login([FromBody] LoginModel model)
         {
             if (ModelState.IsValid)
@@ -179,7 +160,7 @@ namespace Jodit.api
        
         public string GetRandomString()
         {
-            int [] arr = new int [25]; 
+            int [] arr = new int [30]; 
             Random rnd = new Random();
             string str = "";
  

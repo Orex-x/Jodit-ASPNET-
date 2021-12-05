@@ -124,22 +124,7 @@ namespace Jodit.Controllers
         [Authorize]
         public IActionResult GroupInvitations()
         { 
-            /*var userName = User.Identity.Name;
-            User user = db.Users.FirstOrDefault(i => i.Email == userName);
-            
-           
-           var groupInvites = db.GroupInvites
-               .Include(u => u.Group)  // подгружаем данные по группам
-               .Include(c => c.InvitingUser)
-               .Where(c => c.InvitedUserId == user.IdUser) 
-               .ToList();
-            
-           
-           user.GroupInvitations = groupInvites;
-           AccountModel model = new AccountModel()
-            {
-                user = user
-            };*/
+         
             var userEmail = User.Identity.Name;
             api.AccountController controller = new api.AccountController(db);
             var list = controller.GetGroupInvites(userEmail).ToList();
@@ -150,16 +135,52 @@ namespace Jodit.Controllers
         [Authorize]
         public async Task<IActionResult> AcceptGroupInvitations(int idGroupInvitations)
         {
-            api.AccountController controller = new api.AccountController(db);
-            controller.GroupInvitationsAccept(idGroupInvitations);
+            GroupInvite groupInvite = db.GroupInvites
+                .FirstOrDefault(i => i.IdGroupInvite == idGroupInvitations);
+            db.Entry(groupInvite)
+                .Reference(c => c.Group)
+                .Load();
+            
+            db.Entry(groupInvite)
+                .Reference(c => c.InvitingUser)
+                .Load();
+            
+            db.Entry(groupInvite)
+                .Reference(c => c.InvitedUser)
+                .Load();
+            if (groupInvite != null)
+            {
+                groupInvite.InvitedUser.UserGroups.Add(new UserGroup {Group = groupInvite.Group, 
+                    IsAdmin = false, User = groupInvite.InvitedUser});
+                db.GroupInvites.Remove(groupInvite);
+            }
+            db.SaveChanges();
             return RedirectToAction("GroupInvitations", "Account");
         }
         
         [Authorize]
         public async Task<IActionResult> RefuseGroupInvitations(int idGroupInvitations)
         {
-            api.AccountController controller = new api.AccountController(db);
-            controller.GroupInvitationsRefuse(idGroupInvitations);
+            
+            GroupInvite groupInvite =
+                db.GroupInvites.FirstOrDefault(i => i.IdGroupInvite == idGroupInvitations);
+            db.Entry(groupInvite)
+                .Reference(c => c.Group)
+                .Load();
+            
+            db.Entry(groupInvite)
+                .Reference(c => c.InvitingUser)
+                .Load();
+            
+            db.Entry(groupInvite)
+                .Reference(c => c.InvitedUser)
+                .Load();
+
+            if (groupInvite != null)
+            {
+                db.GroupInvites.Remove(groupInvite);
+            }
+            db.SaveChangesAsync();
             return RedirectToAction("GroupInvitations", "Account");
         }
     }
