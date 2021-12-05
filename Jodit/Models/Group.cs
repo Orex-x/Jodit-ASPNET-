@@ -26,6 +26,8 @@ namespace Jodit.Models
         public bool IsPrivate { get; set; }
         
         
+       // public UserSession UserSession { get; set; }
+
         public List<User> Users { get; set; } = new List<User>();
         public List<UserGroup> UserGroups { get; set; } = new List<UserGroup>();
         

@@ -1,4 +1,4 @@
-@model Jodit.ViewModels.AccountModel
+@model List<GroupInvite>
  
 
 @{
@@ -20,7 +20,7 @@
             Actions
         </td>
     </tr>
-    @foreach(var groupInvite in Model.user.GroupInvitations)
+    @foreach(var groupInvite in Model)
     {
         <tr>
             <td>

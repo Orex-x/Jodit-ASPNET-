@@ -37,6 +37,12 @@ namespace Jodit
                     options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
                 });
             services.AddControllersWithViews();
+            services.AddDistributedMemoryCache();
+            services.AddSession();
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options =>
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,11 +59,15 @@ namespace Jodit
                 app.UseHsts();
             }
 
+          
+            
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
+           
+            
             app.UseAuthentication();    // аутентификация
             app.UseAuthorization();     // авторизация
 

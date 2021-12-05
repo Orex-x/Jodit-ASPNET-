@@ -58,6 +58,8 @@ namespace Jodit.Models
         public DbSet<ScheduleChange> ScheduleChanges { get; set; }
         
         public DbSet<ScheduleStatement> ScheduleStatements { get; set; }
+        
+        public DbSet<UserSession> UserSessions { get; set; }
 
     }
 }
