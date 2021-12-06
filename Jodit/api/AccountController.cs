@@ -37,6 +37,26 @@ namespace Jodit.api
         }
         
         
+        [HttpGet]
+        [Route("GetGroups")]
+        public IEnumerable<Group> GetGroups(string idSession)
+        {
+            UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
+            if (session != null)
+            {
+                User user = db.Users.FirstOrDefault(i => i.IdUser == session.UserId);
+               
+                db.Entry(user)
+                    .Collection(c => c.Groups)
+                    .Load();
+                
+                return user.Groups;
+            }
+            return new List<Group>();
+        }
+        
+     
+        
         
         [HttpGet]
         [Route("GetUserGroup")]
@@ -135,7 +155,7 @@ namespace Jodit.api
         
         [HttpPost]
         [Route("LoginAPI")]
-        public string Login([FromBody] LoginModel model)
+        public string LoginAPI([FromBody] LoginModel model)
         {
             if (ModelState.IsValid)
             {
@@ -151,9 +171,7 @@ namespace Jodit.api
                         db.SaveChanges();
                         return sessionId;
                     }
-                    ModelState.AddModelError("", "Сессия уже существует");
                 }
-                ModelState.AddModelError("", "Некорректные логин и(или) пароль");
             }
             return "";
         }
