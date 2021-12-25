@@ -1,57 +1,85 @@
 @model Jodit.ViewModels.RegisterModel
- 
-<h2>Регистрация</h2>
- 
-<form asp-action="Register" asp-controller="Account" asp-anti-forgery="true">
-    <div class="validation" asp-validation-summary="ModelOnly"></div>
-    <div>
-        <div>
-            <label asp-for="Email">First name</label><br />
-            <input type="text" asp-for="FirstName" />
-            <span asp-validation-for="FirstName" />
-        </div>
-        <div>
-            <label asp-for="Email">Second name</label><br />
-            <input type="text" asp-for="SecondName" />
-            <span asp-validation-for="SecondName" />
-        </div>
-        <div>
-            <label asp-for="Email">Last name</label><br />
-            <input type="text" asp-for="LastName" />
-            <span asp-validation-for="LastName" />
-        </div>
-        <div>
-            <label asp-for="Email">Login</label><br />
-            <input type="text" asp-for="Login" />
-            <span asp-validation-for="Login" />
-        </div>
-        <div>
-            <label asp-for="Email">Phone</label><br />
-            <input type="text" asp-for="Phone" />
-            <span asp-validation-for="Phone" />
-        </div>
-        <div>
-            <label asp-for="Email">Введите Email</label><br />
-            <input type="text" asp-for="Email" />
-            <span asp-validation-for="Email" />
-        </div>
-        
-        <div>
-            <label asp-for="Password">Введите пароль</label><br />
-            <input asp-for="Password" />
-            <span asp-validation-for="Password" />
-        </div>
-        <div>
-            <label asp-for="ConfirmPassword">Повторите пароль</label><br />
-            <input asp-for="ConfirmPassword" />
-            <span asp-validation-for="ConfirmPassword" />
-        </div>
-        <div>
-            <input type="submit" value="Регистрация" />
-        </div>
+<section class="vh-100">
+  <div class="container-fluid h-custom">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-md-9 col-lg-6 col-xl-5">
+        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.png" class="img-fluid"
+          alt="Sample image">
+      </div>
+      <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+          <form asp-action="Register" asp-controller="Account" asp-anti-forgery="true">
+              <div class="validation" asp-validation-summary="ModelOnly"></div>
+              
+              
+               <!-- First name input -->
+               <div class="form-outline mb-4">
+                   <input asp-for="FirstName" placeholder="First name" id="form3Example3" class="form-control form-control-lg"/>
+                   <label asp-for="FirstName" class="form-label" for="form3Example3">First name</label>
+                   <span asp-validation-for="FirstName"/>
+               </div>
+               
+                 <!-- Second name input -->
+               <div class="form-outline mb-4">
+                   <input asp-for="SecondName" placeholder="Second name" id="form3Example3" class="form-control form-control-lg"/>
+                   <label asp-for="SecondName" class="form-label" for="form3Example3">Second name</label>
+                   <span asp-validation-for="SecondName"/>
+               </div>
+               
+                <!-- Last name input -->
+               <div class="form-outline mb-4">
+                   <input asp-for="LastName" placeholder="Last name" id="form3Example3" class="form-control form-control-lg"/>
+                   <label asp-for="LastName" class="form-label" for="form3Example3">Last name</label>
+                   <span asp-validation-for="LastName"/>
+               </div>
+               
+                 <!-- Login input -->
+               <div class="form-outline mb-4">
+                   <input asp-for="Login" placeholder="Login" id="form3Example3" class="form-control form-control-lg"/>
+                   <label asp-for="Login" class="form-label" for="form3Example3">Login</label>
+                   <span asp-validation-for="Login"/>
+               </div>
+               
+                  <!-- Phone input -->
+               <div class="form-outline mb-4">
+                   <input asp-for="Phone"  placeholder="Phone" id="form3Example3" class="form-control form-control-lg"/>
+                   <label asp-for="Phone" class="form-label" for="form3Example3">Phone</label>
+                   <span asp-validation-for="Phone"/>
+               </div>
+               
+               <!-- Email input -->
+               <div class="form-outline mb-4">
+                   <input asp-for="Email" type="email" id="form3Example3" class="form-control form-control-lg"
+                          placeholder="Enter a valid email address"/>
+                   <label asp-for="Email" class="form-label" for="form3Example3">Email address</label>
+                   <span asp-validation-for="Email"/>
+               </div>
+               
+               <!-- Password input -->
+               <div class="form-outline mb-3">
+                   <input asp-for="Password" type="password" id="form3Example4" class="form-control form-control-lg"
+                          placeholder="Enter password"/>
+                   <label asp-for="Password" class="form-label" for="form3Example4">Password</label>
+                   <span asp-validation-for="Password"/>
+               </div>
+               
+                <!-- ConfirmPassword input -->
+               <div class="form-outline mb-3">
+                   <input asp-for="ConfirmPassword" type="password" id="form3Example4" class="form-control form-control-lg"
+                          placeholder="Confirm password"/>
+                   <label asp-for="ConfirmPassword" class="form-label" for="form3Example4">Confirm password</label>
+                   <span asp-validation-for="ConfirmPassword"/>
+               </div>
+               
+               
+               <div class="text-center text-lg-start mt-4 pt-2">
+                  <button type="submit" class="btn btn-primary btn-lg"
+                          style="padding-left: 2.5rem; padding-right: 2.5rem;">Register</button>
+               </div>
+          </form>
+      </div>
     </div>
-</form>
-
+  </div>
+</section>
 
 
 

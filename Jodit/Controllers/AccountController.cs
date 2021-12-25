@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Jodit.api;
 using Jodit.Models;
 using Jodit.ViewModels;
 using Microsoft.AspNetCore.Authentication;
@@ -23,34 +22,45 @@ namespace Jodit.Controllers
         }
         
         
-        [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
         
-        
-        
-        [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
- 
-       public async Task<IActionResult> Register(RegisterModel model)
+        
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterModel model)
        {
-           api.AccountController controller = new api.AccountController(db);
-           var idUser =  controller.Post(model);
-           if (idUser != null)
+           if (ModelState.IsValid)
            {
-               User user = await db.Users.FirstOrDefaultAsync(u => u.IdUser == idUser);
-               await Authenticate(user.Email); 
-               return RedirectToAction("Account", "Account");
+               User findUser =  db.Users.FirstOrDefault(u => u.Email == model.Email);
+                
+               if (findUser == null)
+               {
+                   User user = new User
+                   {
+                       FirstName = model.FirstName,
+                       SecondName = model.SecondName,
+                       LastName = model.LastName,
+                       Login = model.Login,
+                       Phone = model.Phone,
+                       Email = model.Email,
+                       UserPassword = model.Password
+                   };
+                   await Authenticate(user.Email); 
+                   db.Users.Add(user);
+                   db.SaveChanges();
+                   return RedirectToAction("Account", "Account");
+               }
            }
            return View(model);
        }
-
-
+       
+        [HttpPost]
        public async Task<IActionResult> Login(LoginModel model)
        {
            if (ModelState.IsValid)
@@ -91,7 +101,15 @@ namespace Jodit.Controllers
         public IActionResult Account()
         {
             var userName = User.Identity.Name;
-            User user = db.Users.Where(i => i.Email == userName).FirstOrDefault();
+            User user = db.Users.FirstOrDefault(u => u.Email == userName);
+            
+            db.Entry(user)
+                .Collection(c => c.UserGroups)
+                .Load();
+            
+            db.Entry(user)
+                .Collection(c => c.Groups)
+                .Load();
             
             AccountModel model = new AccountModel()
             {
@@ -103,19 +121,24 @@ namespace Jodit.Controllers
         [Authorize]
         public IActionResult GroupInvitations()
         { 
-         
-            var userEmail = User.Identity.Name;
-            api.AccountController controller = new api.AccountController(db);
-            var list = controller.GetGroupInvites(userEmail).ToList();
-            return View(list);
+            var userName = User.Identity.Name;
+            User user = db.Users.FirstOrDefault(u => u.Email == userName);
+            
+           
+           var groupInvites = db.GroupInvites
+               .Include(u => u.Group)  // подгружаем данные по группам
+               .Include(c => c.InvitingUser)
+               .Where(c => c.InvitedUserId == user.IdUser) 
+               .ToList();
+
+           return View(groupInvites);
         }
 
         
         [Authorize]
         public async Task<IActionResult> AcceptGroupInvitations(int idGroupInvitations)
         {
-            GroupInvite groupInvite = db.GroupInvites
-                .FirstOrDefault(i => i.IdGroupInvite == idGroupInvitations);
+            GroupInvite groupInvite = db.GroupInvites.FirstOrDefault(gi => gi.IdGroupInvite == idGroupInvitations);
             db.Entry(groupInvite)
                 .Reference(c => c.Group)
                 .Load();
@@ -140,9 +163,7 @@ namespace Jodit.Controllers
         [Authorize]
         public async Task<IActionResult> RefuseGroupInvitations(int idGroupInvitations)
         {
-            
-            GroupInvite groupInvite =
-                db.GroupInvites.FirstOrDefault(i => i.IdGroupInvite == idGroupInvitations);
+            GroupInvite groupInvite = db.GroupInvites.FirstOrDefault(gi => gi.IdGroupInvite == idGroupInvitations);
             db.Entry(groupInvite)
                 .Reference(c => c.Group)
                 .Load();

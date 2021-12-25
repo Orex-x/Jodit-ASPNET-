@@ -15,13 +15,6 @@ namespace Jodit
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
-            /*var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseUrls("http://*:5000")
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .UseStartup<Startup>()
-                .Build();*/
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -30,8 +23,7 @@ namespace Jodit
                 .ConfigureWebHostDefaults(
                     webBuilder =>
                     {
-                        //webBuilder.UseUrls("http://192.168.0.103:5000");
-                        webBuilder.UseUrls("http://192.168.85.214:5000");
+                        webBuilder.UseUrls("http://192.168.0.103:5000");
                         webBuilder.UseContentRoot(Directory.GetCurrentDirectory());
                         webBuilder.UseIISIntegration();
                         webBuilder.UseStartup<Startup>();
