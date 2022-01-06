@@ -199,8 +199,8 @@ namespace Jodit.Controllers
               await db.SaveChangesAsync();
               return RedirectToAction("ListMissions", "Mission");
           }
-          
         
+          
           public async Task<IActionResult> TakeMission(int idUserMission)
           {
               var userName = User.Identity.Name;

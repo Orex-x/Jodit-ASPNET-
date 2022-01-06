@@ -1,8 +1,14 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Jodit.Controllers;
 using Jodit.Models;
 using Jodit.ViewModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,6 +49,27 @@ namespace Jodit.api
                 return user; 
             }
             return new User();
+        }
+        
+        
+            
+        [HttpGet]
+        [Route("GetListMissionsExecutors")]
+        public List<UserMission> GetListMissionsExecutors(string idSession)
+        {
+            UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
+            if (session != null)
+            {
+                var user = db.Users.FirstOrDefault(u => u.IdUser == session.UserId);
+                var executers = db.UserMissions
+                    .Include(u => u.Group)  // подгружаем данные по группам
+                    .Include(c => c.Author)
+                    .Include(a => a.Mission)
+                    .Where(c => c.ExecutorId == user.IdUser)
+                    .ToList();
+                return executers; 
+            }
+            return new List<UserMission>();
         }
         
         [HttpGet]
@@ -150,9 +177,7 @@ namespace Jodit.api
                         db.SaveChanges();
                         return sessionId;
                     }
-                    ModelState.AddModelError("", "Сессия уже существует");
                 }
-                ModelState.AddModelError("", "Некорректные логин и(или) пароль");
             }
             return "";
         }
@@ -196,10 +221,71 @@ namespace Jodit.api
             }
             return -1;
         }
-
-       
+        
+    
         
         
+        [HttpGet]
+        [Route("TakeMission")]
+        public bool TakeMission(int idMission, string idSession)
+        {
+            UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
+            if (session != null)
+            {
+                try
+                {
+                    var user = db.Users.FirstOrDefault(u => u.IdUser == session.UserId);
+                
+                    var userMission = db.UserMissions
+                        .Where(a => a.MissionId == idMission)
+                        .FirstOrDefault(a => a.ExecutorId == user.IdUser);
+              
+                    var a = db.UserMissions
+                        .Include(c => c.Executor)
+                        .Where(c => c.MissionId == userMission.MissionId).ToList();
+              
+              
+                    var newList = a.Where(x=>x.Executor.IdUser != user.IdUser).ToList();
+                    foreach (var um in newList)
+                    {
+                        db.UserMissions.Remove(um);
+                    }
+                    userMission.Status = MissionController.STATUS.TAKE.ToString(); 
+                    db.SaveChanges();
+                }
+                catch (Exception ee)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        
+        [HttpGet]
+        [Route("RefuseMission")]
+        public bool RefuseMission(int idMission, string idSession)
+        {
+            UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
+            if (session != null)
+            {
+                try
+                {
+                    var user = db.Users.FirstOrDefault(u => u.IdUser == session.UserId);
+                    var userMission = db.UserMissions
+                        .Where(a => a.MissionId == idMission)
+                        .FirstOrDefault(a => a.ExecutorId == user.IdUser);
+                    userMission.Status = MissionController.STATUS.REFUSE.ToString(); 
+                    db.SaveChanges();
+                    return true;
+                }
+                catch (Exception ee)
+                {
+                    
+                }
+            }
+            return false;
+        }
         public string GetRandomString()
         {
             int [] arr = new int [25]; 
@@ -208,10 +294,11 @@ namespace Jodit.api
  
             for (int i=0; i<arr.Length; i++)
             {
-                arr[i] = rnd.Next(33,125);
+                arr[i] = rnd.Next(65,90);
                 str += (char) arr[i];
             }
             return str;
         }
     }
+    
 }
