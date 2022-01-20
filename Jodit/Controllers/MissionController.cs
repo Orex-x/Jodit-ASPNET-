@@ -56,7 +56,6 @@ namespace Jodit.Controllers
               return View(model);  
           } 
           
-          
           [HttpPost]
           public async Task<IActionResult> CreateMission(MissionModel model)
           {
@@ -92,8 +91,6 @@ namespace Jodit.Controllers
               }
               return RedirectToAction("ListGroups", "Group");
           }
-          
-          
           
           public IActionResult ListMissions()
           {
@@ -132,10 +129,6 @@ namespace Jodit.Controllers
               return View(model);  
           } 
           
-          
-   
-          
-
           public IActionResult ListExecutors(int id)
           {
               var a = db.UserMissions
@@ -154,8 +147,7 @@ namespace Jodit.Controllers
               };
               
               return View("../User/ListUsers", model);
-          } 
-          
+          }
           
           public IActionResult ListUserMissions(int id)
           {
@@ -182,7 +174,6 @@ namespace Jodit.Controllers
 
               return RedirectToAction("ListMissions", "Mission");
           }
-          
           
           public async Task<IActionResult> deleteMission(int idUserMission)
           {

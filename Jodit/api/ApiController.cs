@@ -9,6 +9,7 @@ using Jodit.Models;
 using Jodit.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -103,18 +104,7 @@ namespace Jodit.api
             db.SaveChanges();
         }
 
-        [HttpDelete]
-        public void GroupInvitationsRefuseAPI(int id)
-        {
-           
-        }
-        
-        [HttpPut]
-        public void GroupInvitationsAcceptAPI(int id)
-        {
-           
-        }
-        
+     
         [HttpPost]
         [Route("GetGroupInvitesAPI")]
         public IEnumerable<GroupInvite> GetGroupInvitesAPI(string userEmail)
@@ -224,6 +214,50 @@ namespace Jodit.api
         
     
         
+           
+        [HttpGet]
+        [Route("CreateMission")]
+        public bool CreateMission(MissionModel model, string idSession)
+        {
+            UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
+            if (session != null)
+            {
+                try
+                {
+                    var author = db.Users.FirstOrDefault(u => u.IdUser == session.UserId);
+                    model.Mission.DateOfCreation = DateTime.Now.Date;
+                    Group group = db.Groups.FirstOrDefault(i => i.IdGroup == model.Group.IdGroup);
+
+                    if (author != null)
+                    {
+                        db.Missions.Add(model.Mission);
+                        foreach (var chooseUser in model.ChooseUsers)
+                        {
+                            if (chooseUser.Checkbox.Value)
+                            {
+                                User executer = db.Users
+                                    .FirstOrDefault(i => i.IdUser == chooseUser.User.IdUser);
+                                author.Authors.Add(new UserMission()
+                                {
+                                    Author = author, 
+                                    Executor = executer, 
+                                    Mission = model.Mission, 
+                                    Group = group,
+                                    Status =  MissionController.STATUS.PENDING.ToString()
+                                });
+                            }
+                        }
+                    }
+                    db.SaveChanges();
+                    return true;
+                }
+                catch (Exception e)
+                {
+
+                }
+            }
+            return false;
+        } 
         
         [HttpGet]
         [Route("TakeMission")]
@@ -261,7 +295,6 @@ namespace Jodit.api
             return true;
         }
         
-        
         [HttpGet]
         [Route("RefuseMission")]
         public bool RefuseMission(int idMission, string idSession)
@@ -286,6 +319,220 @@ namespace Jodit.api
             }
             return false;
         }
+     
+        [HttpGet]
+        [Route("ReturnMission")]
+        public bool ReturnMission(int idUserMission, string idSession)
+        {
+            UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
+            if (session != null)
+            {
+                try
+                {
+                    var userMission = db.UserMissions
+                        .FirstOrDefault(a => a.IdUserMission == idUserMission);
+                    userMission.Status = MissionController.STATUS.TAKE.ToString();
+                    db.SaveChanges();
+                    return true;
+                }
+                catch (Exception ee)
+                {
+                    
+                }
+            }
+            return false;
+        }
+        
+        [HttpGet]
+        [Route("DeleteMission")]
+        public bool DeleteMission(int idUserMission, string idSession)
+        {
+            UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
+            if (session != null)
+            {
+                try
+                {
+                    var userMission = db.UserMissions
+                        .FirstOrDefault(a => a.IdUserMission == idUserMission);
+                    db.UserMissions.Remove(userMission);
+                    db.SaveChanges();
+                    return true;
+                }
+                catch (Exception ee)
+                {
+                    
+                }
+            }
+            return false;
+        }
+        
+        [HttpGet]
+        [Route("PassMission")]
+        public bool PassMission(int idUserMission, string idSession)
+        {
+            UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
+            if (session != null)
+            {
+                try
+                {
+                    var userMission = db.UserMissions
+                        .FirstOrDefault(a => a.IdUserMission == idUserMission);
+                    userMission.Status = MissionController.STATUS.PASS.ToString(); 
+                    db.SaveChanges();
+                    return true;
+                }
+                catch (Exception ee)
+                {
+                    
+                }
+            }
+            return false;
+        }
+        
+        [HttpGet]
+        [Route("CreateScheduleChange")]
+        public bool CreateScheduleChange(ScheduleChangeModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var userAfter = db.Users
+                        .FirstOrDefault(i => i.IdUser == model.ScheduleChange.AfterUser.IdUser);
+                    var userBefore = db.Users
+                        .FirstOrDefault(i => i.IdUser == model.ScheduleChange.BeforeUser.IdUser);
+
+                    var statement = db.ScheduleStatements
+                        .FirstOrDefault(i => i.IdScheduleStatement == model.IdScheduleStatement);
+                 
+                    var group = db.Groups
+                        .FirstOrDefault(gr => gr.IdGroup == model.ScheduleChange.Group.IdGroup);
+                 
+                    var selectedValue = Request.Form["chooseDate"];
+                    var parsedDate = DateTime.Parse(selectedValue);
+                 
+                    model.ScheduleChange.AfterUserDate = parsedDate;
+                    model.ScheduleChange.BeforeUserDate = statement.ReplacementDate;
+                    model.ScheduleChange.BeforeUser = userBefore;
+                    model.ScheduleChange.AfterUser = userAfter;
+                    model.ScheduleChange.Group = group;
+                 
+                 
+                    group.ScheduleChanges.Add(model.ScheduleChange);
+                    db.ScheduleStatements.Remove(statement);
+                    db.SaveChanges();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    
+                }
+            }
+
+            return false;
+        }
+
+        [HttpGet]
+        [Route("LeaveGroup")]
+        public bool LeaveGroup(int idUserGroup)
+        {
+            if (idUserGroup != null)
+            {
+                try
+                {
+                    var userGroup = db.UserGroups
+                        .Include(x => x.Group)
+                        .Include(x => x.User)
+                        .FirstOrDefault(i => i.IdUserGroup == idUserGroup);
+
+                    if (userGroup != null)
+                    {
+                        db.UserGroups.Remove(userGroup); 
+                        db.SaveChangesAsync();
+                        return true;
+                    }
+                }
+                catch (Exception e) {}
+            }
+            return false;
+        }
+        
+        [HttpGet]
+        [Route("EditGroup")]
+        public bool EditGroup(Group group)
+        {
+            try
+            {
+                db.Groups.Update(group); 
+                db.SaveChanges();
+                return true;
+            }
+            catch (Exception e)
+            {
+                
+            }
+            return false;
+        }
+        
+        [HttpGet]
+        [Route("DeleteGroup")]
+        public bool DeleteGroup(int IdGroup)
+        {
+            if (IdGroup != null)
+            {
+                try
+                {
+                    var group = db.Groups
+                        .Include(x => x.Users)
+                        .FirstOrDefault(gr => gr.IdGroup == IdGroup);
+
+                    if (group != null)
+                    {
+                        db.Groups.Remove(group); 
+                        db.SaveChanges();
+                        return true;
+                    }
+                }
+                catch (Exception e)
+                {
+                    
+                }
+            }
+            return false;
+        }
+        
+        [HttpGet]
+        [ActionName("InviteUser")]
+        public bool InviteUser(int idInvitedUser, int idGroup, string idSession)
+        {
+            UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
+            if (session != null)
+            {
+                var invitingUser = db.Users.FirstOrDefault(u => u.IdUser == session.UserId);
+                
+                User invitedUser = db.Users.FirstOrDefault(i => i.IdUser == idInvitedUser);   
+                Group group = db.Groups.FirstOrDefault(i => i.IdGroup == idGroup);
+             
+                var groupInvite = db.GroupInvites
+                    .Where(us => us.InvitedUser.IdUser == invitedUser.IdUser)
+                    .Where(us => us.InvitingUser.IdUser == invitingUser.IdUser)
+                    .FirstOrDefault(gr => gr.GroupId == group.IdGroup);
+             
+                if (invitingUser != null && invitedUser != null && group != null && groupInvite == null)
+                {
+                    invitingUser.GroupApplications.Add(new GroupInvite
+                    {
+                        Group = group, InvitedUser = invitedUser, 
+                        InvitingUser = invitingUser, 
+                        Title = "Вступай в группу"
+                    }); 
+                    db.SaveChanges();
+                    return true;
+                }
+            }
+            return false;
+        }
+        
         public string GetRandomString()
         {
             int [] arr = new int [25]; 

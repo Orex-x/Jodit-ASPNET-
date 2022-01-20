@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Jodit.Models;
 using Jodit.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
 namespace Jodit.Controllers
@@ -17,11 +18,10 @@ namespace Jodit.Controllers
 
          public IActionResult ListUsers(int id)
          {
-             Group group = db.Groups.FirstOrDefault(i => i.IdGroup == id);
+             Group group = db.Groups
+                 .Include(x => x.Users)
+                 .FirstOrDefault(i => i.IdGroup == id);
              
-             db.Entry(group)
-                .Collection(c => c.Users)
-                .Load();
              
              UserModel model = new UserModel
              {

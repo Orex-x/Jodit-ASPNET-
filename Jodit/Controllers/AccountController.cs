@@ -138,49 +138,41 @@ namespace Jodit.Controllers
         [Authorize]
         public async Task<IActionResult> AcceptGroupInvitations(int idGroupInvitations)
         {
-            GroupInvite groupInvite = db.GroupInvites.FirstOrDefault(gi => gi.IdGroupInvite == idGroupInvitations);
-            db.Entry(groupInvite)
-                .Reference(c => c.Group)
-                .Load();
+            GroupInvite groupInvite = db.GroupInvites
+                .Include(x => x.Group)
+                .Include(x => x.InvitingUser)
+                .Include(x => x.InvitedUser)
+                .FirstOrDefault(gi => gi.IdGroupInvite == idGroupInvitations);
             
-            db.Entry(groupInvite)
-                .Reference(c => c.InvitingUser)
-                .Load();
-            
-            db.Entry(groupInvite)
-                .Reference(c => c.InvitedUser)
-                .Load();
             if (groupInvite != null)
             {
-                groupInvite.InvitedUser.UserGroups.Add(new UserGroup {Group = groupInvite.Group, 
-                    IsAdmin = false, User = groupInvite.InvitedUser});
+                groupInvite.InvitedUser.UserGroups.Add(new UserGroup
+                {
+                    Group = groupInvite.Group, 
+                    IsAdmin = false, 
+                    User = groupInvite.InvitedUser
+                });
                 db.GroupInvites.Remove(groupInvite);
+                db.SaveChanges();
             }
-            db.SaveChanges();
+            
             return RedirectToAction("GroupInvitations", "Account");
         }
         
         [Authorize]
         public async Task<IActionResult> RefuseGroupInvitations(int idGroupInvitations)
         {
-            GroupInvite groupInvite = db.GroupInvites.FirstOrDefault(gi => gi.IdGroupInvite == idGroupInvitations);
-            db.Entry(groupInvite)
-                .Reference(c => c.Group)
-                .Load();
-            
-            db.Entry(groupInvite)
-                .Reference(c => c.InvitingUser)
-                .Load();
-            
-            db.Entry(groupInvite)
-                .Reference(c => c.InvitedUser)
-                .Load();
-
+            GroupInvite groupInvite = db.GroupInvites
+                .Include(x => x.Group)
+                .Include(x => x.InvitingUser)
+                .Include(x => x.InvitedUser)
+                .FirstOrDefault(gi => gi.IdGroupInvite == idGroupInvitations);
+           
             if (groupInvite != null)
             {
                 db.GroupInvites.Remove(groupInvite);
+                db.SaveChangesAsync();
             }
-            db.SaveChangesAsync();
             return RedirectToAction("GroupInvitations", "Account");
         }
     }
