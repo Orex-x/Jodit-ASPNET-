@@ -42,42 +42,44 @@ namespace Jodit.Models
          
          [InverseProperty("Group")]
          public List<ScheduleStatement> ScheduleStatements { get; set; }  = new List<ScheduleStatement>();
-         
-         
-         public Dictionary<DateTime, User> CalculateToDate(DateTime date)
-         {
-             Dictionary<DateTime, User> list = new Dictionary<DateTime, User>();
-             DateTime now = DateTime.Now.Date;
-             while (now != date)
-             {
-                 var i = Calculate(now);
-                 User user = Users[i];
-                 //list.Add("Date: " + now.ToShortDateString() + " user: " + user.FirstName + " " + user.SecondName);
-                 list.Add(now, user);
-                 now = now.AddDays(1);
-             }
-             return list;
-         }
 
-         public Dictionary<DateTime, User> CalculateByDate(DateTime date)
-         {
-             var i = Calculate(date);
-             User user = Users[i];
-             return new Dictionary<DateTime, User> { {date, user} };
-           //  return "Date: " + date.ToShortDateString() + " user: " + user.FirstName + " " + user.SecondName;
-         }
-        
-         public int Calculate(DateTime date)
-         {
-             // Считаю разницу в днях 
-             var a = (int) (date - DateOfCreation).TotalDays;
-             // Считаю n полных циклов дежурств прошло с момента создания группы
-             var b = a / Users.Count;
-             // Считаю количесвто дней, необходимых для прохождения n полных циклов
-             var c = b * Users.Count;
-             //нахожу разницу
-             var d = a - c;
-             return d;
-         }
+
+        public ArrayList CalculateToDate(DateTime date)
+        {
+            ArrayList list = new ArrayList();
+            DateTime now = DateTime.Now.Date;
+            while (now != date)
+            {
+                var i = Calculate(now);
+                User user = Users[i];
+                //list.Add("Date: " + now.ToShortDateString() + " user: " + user.FirstName + " " + user.SecondName);
+                list.Add(new UserDateTime() { User = user, DateTime = now, userName = user.FirstName });
+                now = now.AddDays(1);
+            }
+            return list;
+        }
+
+        public UserDateTime CalculateByDate(DateTime date)
+        {
+            var i = Calculate(date);
+            User user = Users[i];
+            return new UserDateTime() { User = user, DateTime = date };
+            //  return new Dictionary<DateTime, User> { {date, user} };
+            //  return "Date: " + date.ToShortDateString() + " user: " + user.FirstName + " " + user.SecondName;
+        }
+
+        public int Calculate(DateTime date)
+        {
+            // Считаю разницу в днях 
+            var a = (int)(date - DateOfCreation).TotalDays;
+            // Считаю n полных циклов дежурств прошло с момента создания группы
+            var b = a / Users.Count;
+            // Считаю количесвто дней, необходимых для прохождения n полных циклов
+            var c = b * Users.Count;
+            //нахожу разницу
+            var d = a - c;
+            return d;
+        }
+
     }
 }

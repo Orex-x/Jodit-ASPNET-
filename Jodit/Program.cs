@@ -23,7 +23,6 @@ namespace Jodit
                 .ConfigureWebHostDefaults(
                     webBuilder =>
                     {
-                        webBuilder.UseUrls("http://192.168.0.103:5000");
                         webBuilder.UseContentRoot(Directory.GetCurrentDirectory());
                         webBuilder.UseIISIntegration();
                         webBuilder.UseStartup<Startup>();

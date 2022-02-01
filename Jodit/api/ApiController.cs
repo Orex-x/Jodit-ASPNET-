@@ -294,7 +294,68 @@ namespace Jodit.api
             }
             return true;
         }
-        
+
+       
+        [HttpGet]
+        [Route("GetSchedule")]
+        public ArrayList GetSchedule(int idGroup, string idSession)
+        {
+            UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
+            if (session != null)
+            {
+                try
+                {
+                    Group group = db.Groups.FirstOrDefault(gr => gr.IdGroup == idGroup);
+                    db.Entry(group)
+                        .Collection(c => c.Users)
+                        .Load();
+
+                    ArrayList list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+                    return list;
+
+                }
+                catch (Exception ee)
+                {
+
+                }
+            }
+            return new ArrayList();
+        }
+
+        [HttpGet]
+        [Route("GetDatesForUser")]
+        public ArrayList GetDatesForUser(int idGroup, string idSession)
+        {
+            UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
+
+            if (session != null)
+            {
+                var user = db.Users.FirstOrDefault(u => u.IdUser == session.UserId);
+
+                Group group = db.Groups.FirstOrDefault(gr => gr.IdGroup == idGroup);
+
+
+                db.Entry(group)
+                    .Collection(c => c.Users)
+                    .Load();
+
+                ArrayList list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+                var listBuf = new ArrayList();
+                foreach (UserDateTime item in list)
+                {
+                    if (item.User.IdUser == user.IdUser)
+                    {
+                        listBuf.Add(item.DateTime);
+                    }
+                }
+
+                return listBuf;
+            }
+            return new ArrayList();
+        }
+
+
+
         [HttpGet]
         [Route("RefuseMission")]
         public bool RefuseMission(int idMission, string idSession)

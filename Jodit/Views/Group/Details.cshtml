@@ -1,3 +1,4 @@
+@using System.Collections
 @model Jodit.ViewModels.GroupDetailsModel
 
 @{
@@ -41,31 +42,32 @@
 <br>
 <h6>@ViewData["ResultCalculateByDate"]</h6>
 
-<br><br><h3>Дежурства на 30 дней вперед</h3>
+<br><br><h3>Дежурства на 30 дней</h3>
 @{
-    Dictionary<DateTime, User> list = Model.UserGroup.Group.CalculateToDate(DateTime.Now.Date.AddDays(30));
-    foreach (var item in list)
+   // Dictionary<DateTime, User> list = Model.UserGroup.Group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+    ArrayList list = Model.UserGroup.Group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+    foreach (UserDateTime item in list)
     {
-        var a = Model.ScheduleChanges.FirstOrDefault(x => x.AfterUserDate == item.Key);
-        var b = Model.ScheduleChanges.FirstOrDefault(x => x.BeforeUserDate == item.Key);
+        var a = Model.ScheduleChanges.FirstOrDefault(x => x.AfterUserDate == item.DateTime);
+        var b = Model.ScheduleChanges.FirstOrDefault(x => x.BeforeUserDate == item.DateTime);
         
         if (a != null)
         {
             <h6>
-                Date: @item.Key.ToShortDateString()
+                Date: @item.DateTime.ToShortDateString()
                 user: @a.BeforeUser.FirstName @a.BeforeUser.SecondName
             </h6>
         }
         else if (b != null)
         {
             <h6>
-                Date: @item.Key.ToShortDateString()
+                Date: @item.DateTime.ToShortDateString()
                 user: @b.AfterUser.FirstName @b.AfterUser.SecondName
             </h6>
         }
         else
         {
-            <h6>Date: @item.Key.ToShortDateString() user: @item.Value.FirstName  @item.Value.SecondName</h6>
+            <h6>Date: @item.DateTime.ToShortDateString() user: @item.User.FirstName  @item.User.SecondName</h6>
         }
     }
 }

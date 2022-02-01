@@ -54,41 +54,44 @@ namespace Jodit.Controllers
              await db.SaveChangesAsync();
               return RedirectToAction("ListGroups", "Group");
          }
-         
-         
-         public IActionResult CreateStatement(int id)
-         {
-             var userName = User.Identity.Name;
-             User user = db.Users.FirstOrDefault(i => i.Email == userName);
-             Group group = db.Groups
-                 .Include(x => x.Users)
-                 .FirstOrDefault(gr => gr.IdGroup == id);
-             
-             
-             Dictionary<DateTime, User> dictionary = group
-                 .CalculateToDate(DateTime.Now.Date.AddDays(30));
-             var list = new ArrayList();
-             foreach (var item in dictionary)
-             {
-                 if (item.Value.IdUser == user.IdUser)
-                     list.Add(item.Key); 
-             }
-
-             ScheduleStatementModel model = new ScheduleStatementModel()
-             {
-                 DateTimes = list,
-                 ScheduleStatement = new ScheduleStatement()
-                 {
-                     Group = group,
-                     BeforeUser = user,
-                 }
-             };
-
-             return View(model);
-         }
 
 
-         [HttpPost]
+        public IActionResult CreateStatement(int id)
+        {
+            var userName = User.Identity.Name;
+            User user = db.Users.FirstOrDefault(i => i.Email == userName);
+            Group group = db.Groups.FirstOrDefault(gr => gr.IdGroup == id);
+            db.Entry(group)
+                .Collection(c => c.Users)
+                .Load();
+
+            //  Dictionary<DateTime, User> dictionary = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+            ArrayList list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+            var listBuf = new ArrayList();
+            foreach (UserDateTime item in list)
+            {
+                if (item.User.IdUser == user.IdUser)
+                {
+                    listBuf.Add(item.DateTime);
+                }
+            }
+
+            ScheduleStatementModel model = new ScheduleStatementModel()
+            {
+                DateTimes = listBuf,
+                ScheduleStatement = new ScheduleStatement()
+                {
+                    Group = group,
+                    BeforeUser = user,
+                }
+            };
+
+            return View(model);
+        }
+
+
+
+        [HttpPost]
          public async Task<IActionResult> CreateStatement(ScheduleStatementModel model)
          {
              if (ModelState.IsValid)
@@ -108,46 +111,44 @@ namespace Jodit.Controllers
              }
              return RedirectToAction("ListGroups", "Group");
          }
-         
-         public IActionResult CreateScheduleChange
-             (int idGroup, int idUserBefore, int idScheduleStatement)
-         {
-             var userName = User.Identity.Name;
-             User user = db.Users.FirstOrDefault(i => i.Email == userName);
-             User userBefore = db.Users.FirstOrDefault(i => i.IdUser == idUserBefore);
-             Group group = db.Groups
-                     .Include(x => x.Users)
-                     .FirstOrDefault(gr => gr.IdGroup == idGroup);
-             
-             
-             
-             Dictionary<DateTime, User> dictionary =
-                 group.CalculateToDate(DateTime.Now.Date.AddDays(30));
-             var list = new ArrayList();
-             foreach (var item in dictionary)
-             {
-                 if (item.Value.IdUser == user.IdUser)
-                 {
-                     list.Add(item.Key);
-                 }
-             }
 
-             ScheduleChangeModel model = new ScheduleChangeModel
-             {
-                 DateTimes = list,
-                 ScheduleChange = new ScheduleChange
-                 {
-                     Group = group,
-                     AfterUser = user,
-                     BeforeUser = userBefore
-                 },
-                 IdScheduleStatement = idScheduleStatement
-             };
-                 
-             return View(model);
-         }
-         
-         [HttpPost]
+        public IActionResult CreateScheduleChange(int idGroup, int idUserBefore, int idScheduleStatement)
+        {
+            var userName = User.Identity.Name;
+            User user = db.Users.FirstOrDefault(i => i.Email == userName);
+            User userBefore = db.Users.FirstOrDefault(i => i.IdUser == idUserBefore);
+            Group group = db.Groups.FirstOrDefault(gr => gr.IdGroup == idGroup);
+            db.Entry(group)
+                .Collection(c => c.Users)
+                .Load();
+
+            // Dictionary<DateTime, User> dictionary = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+            ArrayList list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+            var listBuf = new ArrayList();
+            foreach (UserDateTime item in list)
+            {
+                if (item.User.IdUser == user.IdUser)
+                {
+                    listBuf.Add(item.DateTime);
+                }
+            }
+
+            ScheduleChangeModel model = new ScheduleChangeModel
+            {
+                DateTimes = listBuf,
+                ScheduleChange = new ScheduleChange
+                {
+                    Group = group,
+                    AfterUser = user,
+                    BeforeUser = userBefore
+                },
+                IdScheduleStatement = idScheduleStatement
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
          public async Task<IActionResult> CreateScheduleChange(ScheduleChangeModel model)
          {
              if (ModelState.IsValid)
@@ -214,7 +215,10 @@ namespace Jodit.Controllers
                  {
                      if (date.Date != DateTime.MinValue)
                      {
-                         ViewData["ResultCalculateByDate"] = group.CalculateByDate(date.Date);
+                        UserDateTime ud = group.CalculateByDate(date.Date); 
+                        string str =  "Date: " + ud.DateTime.ToShortDateString() + " user: " + 
+                                      ud.User.FirstName + " " + ud.User.SecondName; 
+                        ViewData["ResultCalculateByDate"] = str;
                      }
                      
                      GroupDetailsModel model = new GroupDetailsModel()
