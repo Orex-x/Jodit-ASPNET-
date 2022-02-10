@@ -45,7 +45,7 @@
                 <td>
                     Author @userMission.Author.FirstName @userMission.Author.SecondName
                     from the group @userMission.Group.GroupName
-                    <a asp-action="ListExecutors" asp-route-id="@userMission.MissionId" asp-controller="Mission">list executors</a><br>
+                    <a asp-action="ListExecutors" asp-route-id="@userMission.Mission.IdMission" asp-controller="Mission">list executors</a><br>
                 </td>
             </tr>
         }
@@ -73,7 +73,7 @@
                 <td>
                     Author @userMission.Author.FirstName @userMission.Author.SecondName
                     from the group @userMission.Group.GroupName
-                    <a asp-action="ListExecutors" asp-route-id="@userMission.MissionId" asp-controller="Mission">list executors</a><br>
+                    <a asp-action="ListExecutors" asp-route-id="@userMission.Mission.IdMission" asp-controller="Mission">list executors</a><br>
                 </td>
             </tr>
         }
@@ -102,7 +102,7 @@
                  <a asp-action="deleteMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">delete</a><br>
              </td>
              <td>
-                 <a asp-action="ListUserMissions" asp-route-id="@userMission.MissionId" asp-controller="Mission">list executors</a><br>
+                 <a asp-action="ListUserMissions" asp-route-id="@userMission.Mission.IdMission" asp-controller="Mission">list executors</a><br>
              </td>
          </tr>
      }

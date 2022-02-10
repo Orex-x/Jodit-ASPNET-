@@ -58,7 +58,7 @@ namespace Jodit.Controllers
              var groupInvite = db.GroupInvites
                  .Where(us => us.InvitedUser.IdUser == invitedUser.IdUser)
                  .Where(us => us.InvitingUser.IdUser == invitingUser.IdUser)
-                 .FirstOrDefault(gr => gr.GroupId == group.IdGroup);
+                 .FirstOrDefault(gr => gr.Group.IdGroup == group.IdGroup);
              
              if (invitingUser != null && invitedUser != null && group != null && groupInvite == null)
              {

@@ -3,13 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Jodit.Models
 {
-    [Table("jodit_user_session")]
-    public class UserSession
+    [Table("jodit_UserChatID")]
+    public class UserChatID
     {
         [Key]
-        public int IdUserSession { get; set; }
+        public int IdUserChatId{ get; set; }
         public User User { get; set; }
-        public string IdSession { get; set; }
-        
+        public string ChatID { get; set; }
+        public string Key { get; set; }
     }
 }

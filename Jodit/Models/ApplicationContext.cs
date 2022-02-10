@@ -7,9 +7,25 @@ namespace Jodit.Models
 {
     public class ApplicationContext  : DbContext
     {
-       
-   
+        public DbSet<User> Users { get; set; }
         
+        public DbSet<Group> Groups { get; set; }
+        
+        public DbSet<UserGroup> UserGroups { get; set; }
+        
+        public DbSet<GroupInvite> GroupInvites { get; set; }
+        
+        public DbSet<Mission> Missions { get; set; }
+        
+        public DbSet<UserMission> UserMissions { get; set; }
+        
+        public DbSet<ScheduleChange> ScheduleChanges { get; set; }
+        
+        public DbSet<ScheduleStatement> ScheduleStatements { get; set; }
+        
+        public DbSet<UserSession> UserSessions { get; set; }
+        
+        public DbSet<UserChatID> UserChatIds { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options)
         {
@@ -39,27 +55,9 @@ namespace Jodit.Models
                         j.HasKey(t => new { t.GroupId, t.UserId});
                         j.ToTable("jodit_user_group");
                     });
-            
-          
         }
          
-        public DbSet<User> Users { get; set; }
-        
-        public DbSet<Group> Groups { get; set; }
-        
-        public DbSet<UserGroup> UserGroups { get; set; }
-        
-        public DbSet<GroupInvite> GroupInvites { get; set; }
-        
-        public DbSet<Mission> Missions { get; set; }
-        
-        public DbSet<UserMission> UserMissions { get; set; }
-        
-        public DbSet<ScheduleChange> ScheduleChanges { get; set; }
-        
-        public DbSet<ScheduleStatement> ScheduleStatements { get; set; }
-        
-        public DbSet<UserSession> UserSessions { get; set; }
+      
 
     }
 }

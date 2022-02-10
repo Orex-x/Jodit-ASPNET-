@@ -24,7 +24,7 @@ namespace Jodit.Controllers
                 User user = db.Users.FirstOrDefault(i => i.Email == userName);
                 var userGroups = db.UserGroups
                     .Include(g => g.Group)
-                    .Where(i => i.UserId == user.IdUser).ToList();
+                    .Where(i => i.User.IdUser == user.IdUser).ToList();
                 
                 
             GroupModel accountModel = new GroupModel
@@ -44,6 +44,7 @@ namespace Jodit.Controllers
              group.DateOfCreation = DateTime.Today;
              var userName = User.Identity.Name;
              User user = db.Users.FirstOrDefault(i => i.Email == userName);
+             
              
              db.Groups.Add(group);
              if (user != null)
@@ -208,8 +209,8 @@ namespace Jodit.Controllers
                      .FirstOrDefaultAsync(gr => gr.IdGroup == id);
 
                  var userGroup = await db.UserGroups
-                     .Where(i => i.GroupId == id)
-                     .FirstOrDefaultAsync(i => i.UserId == user.IdUser);
+                     .Where(i => i.Group.IdGroup == id)
+                     .FirstOrDefaultAsync(i => i.User.IdUser == user.IdUser);
                  
                  if (userGroup != null)
                  {
@@ -224,7 +225,7 @@ namespace Jodit.Controllers
                      GroupDetailsModel model = new GroupDetailsModel()
                      {
                          UserGroup = userGroup,
-                         ScheduleChanges = group.ScheduleChanges
+                         ScheduleChanges = group.ScheduleChanges.ToList()
                      };
                      
                      return View(model);

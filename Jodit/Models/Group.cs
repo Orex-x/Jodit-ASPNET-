@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Jodit.Models
 {
@@ -10,38 +11,23 @@ namespace Jodit.Models
     public class Group
     {
         [Key]
-        [Column("id_group")]
         public int IdGroup { get; set; }
-
-        [Column("group_name")]
+        
         public string GroupName { get; set; }
         
-        [Column("description")]
         public string Description { get; set; }
         
-        [Column("date_of_creation")]
         public DateTime DateOfCreation { get; set; }
         
-        [Column("is_private")]
         public bool IsPrivate { get; set; }
-        
-        
-       // public UserSession UserSession { get; set; }
 
-        public List<User> Users { get; set; } = new List<User>();
-        public List<UserGroup> UserGroups { get; set; } = new List<UserGroup>();
+        public virtual ICollection<User> Users { get; set; } = new List<User>();
         
-        [InverseProperty("Group")]
-         public List<GroupInvite> GroupInvites { get; set; }  = new List<GroupInvite>();
-         
-         [InverseProperty("Group")]
-         public List<UserMission> UserMissions { get; set; }  = new List<UserMission>();
-         
-         [InverseProperty("Group")]
-         public List<ScheduleChange> ScheduleChanges { get; set; }  = new List<ScheduleChange>();
-         
-         [InverseProperty("Group")]
-         public List<ScheduleStatement> ScheduleStatements { get; set; }  = new List<ScheduleStatement>();
+        public virtual List<UserGroup> UserGroups { get; set; } = new List<UserGroup>();
+        
+        public virtual ICollection<ScheduleChange> ScheduleChanges { get; set; }
+        
+        public virtual ICollection<ScheduleStatement> ScheduleStatements { get; set; }
 
 
         public ArrayList CalculateToDate(DateTime date)
@@ -51,7 +37,7 @@ namespace Jodit.Models
             while (now != date)
             {
                 var i = Calculate(now);
-                User user = Users[i];
+                User user = Users.ToList()[i];
                 //list.Add("Date: " + now.ToShortDateString() + " user: " + user.FirstName + " " + user.SecondName);
                 list.Add(new UserDateTime() { User = user, DateTime = now, userName = user.FirstName });
                 now = now.AddDays(1);
@@ -62,7 +48,7 @@ namespace Jodit.Models
         public UserDateTime CalculateByDate(DateTime date)
         {
             var i = Calculate(date);
-            User user = Users[i];
+            User user = Users.ToList()[i];
             return new UserDateTime() { User = user, DateTime = date };
             //  return new Dictionary<DateTime, User> { {date, user} };
             //  return "Date: " + date.ToShortDateString() + " user: " + user.FirstName + " " + user.SecondName;

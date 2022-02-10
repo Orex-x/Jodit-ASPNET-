@@ -12,11 +12,10 @@ namespace Jodit.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private ApplicationContext db;
+        public HomeController(ApplicationContext context)
         {
-            _logger = logger;
+            db = context;
         }
 
         public IActionResult Index()
@@ -28,6 +27,24 @@ namespace Jodit.Controllers
         {
             return View();
         }
+        
+        public IActionResult TelegramBot()
+        {
+             var userName = User.Identity.Name;
+             string key =  KeyGenerator.GetRandomString();
+             UserChatID userChatId = new UserChatID()
+             {
+                 Key = key,
+                 User = db.Users.FirstOrDefault(i => i.Email == userName)
+             };
+
+             db.UserChatIds.Add(userChatId);
+             db.SaveChanges(); 
+             
+             ViewData["key"] = key;
+             return View();
+        }
+        
         
        
 

@@ -9,15 +9,15 @@
 <a asp-action="createGroup" asp-controller="Group">Add group</a><br>
 <a asp-action="GroupInvitations" asp-controller="Account">My invitations</a><br>
 <a asp-action="ListMissions" asp-controller="Mission">My missions</a>
-
+<a asp-action="TelegramBot" asp-controller="Home">Telegram bot</a><br>
 
 
    
-@foreach(var userGroup in Model.user.UserGroups)
+@foreach(var item in Model.user.UserGroups)
 {
         
     <div>
-        <a asp-action="Details" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup"><h5>@userGroup.Group.GroupName</h5></a>
+        <a asp-action="Details" asp-controller="Group" asp-route-id="@item.Group.IdGroup"><h5>@item.Group.GroupName</h5></a>
     </div>
 }
 

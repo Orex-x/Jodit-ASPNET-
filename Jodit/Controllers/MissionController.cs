@@ -117,7 +117,7 @@ namespace Jodit.Controllers
 
               var authorsMissions = new List<UserMission>();
               foreach (var authorsMission in b)
-                  if (authorsMissions.FirstOrDefault(x => x.MissionId == authorsMission.MissionId) == null)
+                  if (authorsMissions.FirstOrDefault(x => x.Mission.IdMission == authorsMission.Mission.IdMission) == null)
                       authorsMissions.Add(authorsMission);
 
               MissionModel model = new MissionModel
@@ -133,7 +133,7 @@ namespace Jodit.Controllers
           {
               var a = db.UserMissions
                   .Include(c => c.Executor)
-                  .Where(c => c.MissionId == id).ToList();
+                  .Where(c => c.Mission.IdMission == id).ToList();
               
               List<User> executors = new List<User>();
               foreach (var userMission in a)
@@ -153,7 +153,7 @@ namespace Jodit.Controllers
           {
               var a = db.UserMissions
                   .Include(c => c.Executor)
-                  .Where(c => c.MissionId == id).ToList();
+                  .Where(c => c.Mission.IdMission == id).ToList();
               return View(a);
           } 
           
@@ -200,7 +200,7 @@ namespace Jodit.Controllers
               
               var a = db.UserMissions
                   .Include(c => c.Executor)
-                  .Where(c => c.MissionId == userMission.MissionId).ToList();
+                  .Where(c => c.Mission.IdMission == userMission.Mission.IdMission).ToList();
               
               
               var newList = a.Where(x=>x.Executor.IdUser != user.IdUser).ToList();

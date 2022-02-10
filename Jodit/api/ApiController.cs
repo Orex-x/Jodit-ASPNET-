@@ -2,14 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Jodit.Controllers;
 using Jodit.Models;
 using Jodit.ViewModels;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +27,7 @@ namespace Jodit.api
             UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
             if (session != null)
             {
-                var user = db.Users.FirstOrDefault(u => u.IdUser == session.UserId);
+                var user = db.Users.FirstOrDefault(u => u.IdUser == session.User.IdUser);
                 
                 db.Entry(user)
                     .Collection(c => c.Groups)
@@ -42,7 +37,7 @@ namespace Jodit.api
                     .Include(u => u.Group)  // подгружаем данные по группам
                     .Include(c => c.Author)
                     .Include(a => a.Mission)
-                    .Where(c => c.ExecutorId == user.IdUser)
+                    .Where(c => c.Executor.IdUser == user.IdUser)
                     .ToList();
 
                 user.Executors = executers;
@@ -61,12 +56,12 @@ namespace Jodit.api
             UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
             if (session != null)
             {
-                var user = db.Users.FirstOrDefault(u => u.IdUser == session.UserId);
+                var user = db.Users.FirstOrDefault(u => u.IdUser == session.User.IdUser);
                 var executers = db.UserMissions
                     .Include(u => u.Group)  // подгружаем данные по группам
                     .Include(c => c.Author)
                     .Include(a => a.Mission)
-                    .Where(c => c.ExecutorId == user.IdUser)
+                    .Where(c => c.Executor.IdUser == user.IdUser)
                     .ToList();
                 return executers; 
             }
@@ -80,7 +75,7 @@ namespace Jodit.api
             UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
             if (session != null)
             {
-                var user = db.Users.FirstOrDefault(u => u.IdUser == session.UserId);
+                var user = db.Users.FirstOrDefault(u => u.IdUser == session.User.IdUser);
                 
                 db.Entry(user)
                     .Collection(c => c.Executors)
@@ -113,7 +108,7 @@ namespace Jodit.api
             var groupInvites = db.GroupInvites
                 .Include(u => u.Group)  // подгружаем данные по группам
                 .Include(c => c.InvitingUser)
-                .Where(c => c.InvitedUserId == user.IdUser);
+                .Where(c => c.InvitedUser.IdUser == user.IdUser);
             return groupInvites;
         }
 
@@ -138,7 +133,7 @@ namespace Jodit.api
                         UserPassword = model.Password
                     };
                     
-                    string sessionId = GetRandomString();
+                    string sessionId = KeyGenerator.GetRandomString();
                     db.UserSessions.Add(new UserSession() {User = user, IdSession = sessionId});
                     db.Users.Add(user);
                     db.SaveChanges();
@@ -159,10 +154,10 @@ namespace Jodit.api
                     (u => u.Email == model.Email && u.UserPassword == model.Password);
                 if (user != null)
                 {
-                    UserSession session = db.UserSessions.FirstOrDefault(x => x.UserId == user.IdUser);
+                    UserSession session = db.UserSessions.FirstOrDefault(x => x.User.IdUser == user.IdUser);
                     if (session == null)
                     {
-                        string sessionId = GetRandomString();
+                        string sessionId = KeyGenerator.GetRandomString();
                         db.UserSessions.Add(new UserSession() {User = user, IdSession = sessionId});
                         db.SaveChanges();
                         return sessionId;
@@ -199,7 +194,7 @@ namespace Jodit.api
             if (group != null && session != null)
             {
                 group.DateOfCreation = DateTime.Today;
-                var user = db.Users.FirstOrDefault(u => u.IdUser == session.UserId);
+                var user = db.Users.FirstOrDefault(u => u.IdUser == session.User.IdUser);
                
                 db.Groups.Add(group);
                 if (user != null)
@@ -224,7 +219,7 @@ namespace Jodit.api
             {
                 try
                 {
-                    var author = db.Users.FirstOrDefault(u => u.IdUser == session.UserId);
+                    var author = db.Users.FirstOrDefault(u => u.IdUser == session.User.IdUser);
                     model.Mission.DateOfCreation = DateTime.Now.Date;
                     Group group = db.Groups.FirstOrDefault(i => i.IdGroup == model.Group.IdGroup);
 
@@ -268,15 +263,15 @@ namespace Jodit.api
             {
                 try
                 {
-                    var user = db.Users.FirstOrDefault(u => u.IdUser == session.UserId);
+                    var user = db.Users.FirstOrDefault(u => u.IdUser == session.User.IdUser);
                 
                     var userMission = db.UserMissions
-                        .Where(a => a.MissionId == idMission)
-                        .FirstOrDefault(a => a.ExecutorId == user.IdUser);
+                        .Where(a => a.Mission.IdMission == idMission)
+                        .FirstOrDefault(a => a.Executor.IdUser == user.IdUser);
               
                     var a = db.UserMissions
                         .Include(c => c.Executor)
-                        .Where(c => c.MissionId == userMission.MissionId).ToList();
+                        .Where(c => c.Mission.IdMission == userMission.Mission.IdMission).ToList();
               
               
                     var newList = a.Where(x=>x.Executor.IdUser != user.IdUser).ToList();
@@ -330,7 +325,7 @@ namespace Jodit.api
 
             if (session != null)
             {
-                var user = db.Users.FirstOrDefault(u => u.IdUser == session.UserId);
+                var user = db.Users.FirstOrDefault(u => u.IdUser == session.User.IdUser);
 
                 Group group = db.Groups.FirstOrDefault(gr => gr.IdGroup == idGroup);
 
@@ -365,10 +360,10 @@ namespace Jodit.api
             {
                 try
                 {
-                    var user = db.Users.FirstOrDefault(u => u.IdUser == session.UserId);
+                    var user = db.Users.FirstOrDefault(u => u.IdUser == session.User.IdUser);
                     var userMission = db.UserMissions
-                        .Where(a => a.MissionId == idMission)
-                        .FirstOrDefault(a => a.ExecutorId == user.IdUser);
+                        .Where(a => a.Mission.IdMission == idMission)
+                        .FirstOrDefault(a => a.Executor.IdUser == user.IdUser);
                     userMission.Status = MissionController.STATUS.REFUSE.ToString(); 
                     db.SaveChanges();
                     return true;
@@ -569,7 +564,7 @@ namespace Jodit.api
             UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
             if (session != null)
             {
-                var invitingUser = db.Users.FirstOrDefault(u => u.IdUser == session.UserId);
+                var invitingUser = db.Users.FirstOrDefault(u => u.IdUser == session.User.IdUser);
                 
                 User invitedUser = db.Users.FirstOrDefault(i => i.IdUser == idInvitedUser);   
                 Group group = db.Groups.FirstOrDefault(i => i.IdGroup == idGroup);
@@ -577,7 +572,7 @@ namespace Jodit.api
                 var groupInvite = db.GroupInvites
                     .Where(us => us.InvitedUser.IdUser == invitedUser.IdUser)
                     .Where(us => us.InvitingUser.IdUser == invitingUser.IdUser)
-                    .FirstOrDefault(gr => gr.GroupId == group.IdGroup);
+                    .FirstOrDefault(gr => gr.Group.IdGroup == group.IdGroup);
              
                 if (invitingUser != null && invitedUser != null && group != null && groupInvite == null)
                 {
@@ -594,19 +589,63 @@ namespace Jodit.api
             return false;
         }
         
-        public string GetRandomString()
+        [HttpGet]
+        [Route("getUserByDate")]
+        public string GetUserByDate(int idGroup)
         {
-            int [] arr = new int [25]; 
-            Random rnd = new Random();
-            string str = "";
- 
-            for (int i=0; i<arr.Length; i++)
-            {
-                arr[i] = rnd.Next(65,90);
-                str += (char) arr[i];
-            }
-            return str;
+            Group group = db.Groups
+                .Include(x => x.Users)
+                .FirstOrDefault(x => x.IdGroup == idGroup);
+
+            var g = db.UserGroups
+                .Include(x => x.Group)
+                .ThenInclude(x => x.Users)
+                .FirstOrDefault(x => x.Group.IdGroup == idGroup);
+            
+            var UserDateTime = group.CalculateByDate(DateTime.Now);
+            return UserDateTime.User.FirstName +  " " + UserDateTime.User.LastName;
         }
+        
+        [HttpGet]
+        [Route("GetGroupsByUser")]
+        public ArrayList GetGroupsByUser(string idChat)
+        {
+            var list = new ArrayList();
+
+            UserChatID userChatId = db.UserChatIds
+                .Include(x => x.User)
+                .ThenInclude(x => x.Groups)
+                .FirstOrDefault(x => x.ChatID.Equals(idChat));
+            if (userChatId == null)
+            {
+                foreach (var item in userChatId.User.Groups.ToList())
+                {
+                    list.Add(new GroupBot()
+                    {
+                        IdGroup = item.IdGroup,
+                        NameGroup = item.GroupName
+                    });
+                }
+            } 
+            return list;
+        }
+        
+        [HttpGet]
+        [Route("RegUserChat")]
+        public bool RegUserChat(string idChat, string key)
+        {
+            try
+            {
+                UserChatID userChatId = db.UserChatIds.FirstOrDefault(x => x.Key.Equals(key));
+                userChatId.ChatID = idChat;
+                userChatId.Key = null;
+                db.SaveChanges();
+                return true;    
+            }catch(Exception e){}
+            return false;
+        }
+
+        
     }
     
 }

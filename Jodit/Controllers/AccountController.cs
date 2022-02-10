@@ -101,15 +101,11 @@ namespace Jodit.Controllers
         public IActionResult Account()
         {
             var userName = User.Identity.Name;
-            User user = db.Users.FirstOrDefault(u => u.Email == userName);
+            User user = db.Users
+                .Include(x => x.UserGroups)
+                .ThenInclude(x => x.Group)
+                .FirstOrDefault(u => u.Email == userName);
             
-            db.Entry(user)
-                .Collection(c => c.UserGroups)
-                .Load();
-            
-            db.Entry(user)
-                .Collection(c => c.Groups)
-                .Load();
             
             AccountModel model = new AccountModel()
             {
@@ -128,7 +124,7 @@ namespace Jodit.Controllers
            var groupInvites = db.GroupInvites
                .Include(u => u.Group)  // подгружаем данные по группам
                .Include(c => c.InvitingUser)
-               .Where(c => c.InvitedUserId == user.IdUser) 
+               .Where(c => c.InvitedUser.IdUser == user.IdUser) 
                .ToList();
 
            return View(groupInvites);
