@@ -8,8 +8,10 @@ using Jodit.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Jodit.Controllers
 {
@@ -41,6 +43,7 @@ namespace Jodit.Controllers
                 
                if (findUser == null)
                {
+                   var hasher = new PasswordHasher<User>();
                    User user = new User
                    {
                        FirstName = model.FirstName,
@@ -49,8 +52,8 @@ namespace Jodit.Controllers
                        Login = model.Login,
                        Phone = model.Phone,
                        Email = model.Email,
-                       UserPassword = model.Password
                    };
+                   user.UserPassword = hasher.HashPassword(user, model.Password);
                    await Authenticate(user.Email); 
                    db.Users.Add(user);
                    db.SaveChanges();
@@ -65,12 +68,18 @@ namespace Jodit.Controllers
        {
            if (ModelState.IsValid)
            {
-               User user =  db.Users.FirstOrDefault
-                   (u => u.Email == model.Email && u.UserPassword == model.Password);
+               var hasher = new PasswordHasher<User>();
+               User user =  db.Users.FirstOrDefault(u => u.Email == model.Email);
                if (user != null)
                {
-                   await Authenticate(user.Email); 
-                   return RedirectToAction("Account", "Account");
+                   var s = hasher.
+                        VerifyHashedPassword(user, user.UserPassword, model.Password);
+                   
+                    if (s == PasswordVerificationResult.Success)
+                    {
+                        await Authenticate(user.Email); 
+                        return RedirectToAction("Account", "Account");
+                    }
                }
                ModelState.AddModelError("", "Некорректные логин и(или) пароль");
            }
