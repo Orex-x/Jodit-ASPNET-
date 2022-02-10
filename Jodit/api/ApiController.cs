@@ -5,6 +5,7 @@ using System.Linq;
 using Jodit.Controllers;
 using Jodit.Models;
 using Jodit.ViewModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -122,6 +123,7 @@ namespace Jodit.api
                 
                 if (findUser == null)
                 {
+                    var hasher = new PasswordHasher<User>();
                     User user = new User
                     {
                         FirstName = model.FirstName,
@@ -130,9 +132,8 @@ namespace Jodit.api
                         Login = model.Login,
                         Phone = model.Phone,
                         Email = model.Email,
-                        UserPassword = model.Password
                     };
-                    
+                    user.UserPassword = hasher.HashPassword(user, model.Password);
                     string sessionId = KeyGenerator.GetRandomString();
                     db.UserSessions.Add(new UserSession() {User = user, IdSession = sessionId});
                     db.Users.Add(user);
@@ -151,16 +152,23 @@ namespace Jodit.api
             if (ModelState.IsValid)
             {
                 User user =  db.Users.FirstOrDefault
-                    (u => u.Email == model.Email && u.UserPassword == model.Password);
+                    (u => u.Email == model.Email);
                 if (user != null)
                 {
-                    UserSession session = db.UserSessions.FirstOrDefault(x => x.User.IdUser == user.IdUser);
-                    if (session == null)
+                    var hasher = new PasswordHasher<User>();
+                    var s = hasher.
+                        VerifyHashedPassword(user, user.UserPassword, model.Password);
+
+                    if (s == PasswordVerificationResult.Success)
                     {
-                        string sessionId = KeyGenerator.GetRandomString();
-                        db.UserSessions.Add(new UserSession() {User = user, IdSession = sessionId});
-                        db.SaveChanges();
-                        return sessionId;
+                        UserSession session = db.UserSessions.FirstOrDefault(x => x.User.IdUser == user.IdUser);
+                        if (session == null)
+                        {
+                            string sessionId = KeyGenerator.GetRandomString();
+                            db.UserSessions.Add(new UserSession {User = user, IdSession = sessionId});
+                            db.SaveChanges();
+                            return sessionId;
+                        }
                     }
                 }
             }

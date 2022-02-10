@@ -68,10 +68,10 @@ namespace Jodit.Controllers
        {
            if (ModelState.IsValid)
            {
-               var hasher = new PasswordHasher<User>();
                User user =  db.Users.FirstOrDefault(u => u.Email == model.Email);
                if (user != null)
                {
+                   var hasher = new PasswordHasher<User>();
                    var s = hasher.
                         VerifyHashedPassword(user, user.UserPassword, model.Password);
                    
