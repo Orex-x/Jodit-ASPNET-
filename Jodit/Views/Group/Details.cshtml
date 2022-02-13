@@ -4,31 +4,23 @@
 @{
     ViewData["Title"] = "Details";
 }
-<h1>@Model.UserGroup.Group.GroupName</h1>
+<h1>@Model.UserGroup.Group.GroupName</h1><br>
 
 
-<br><a asp-action="ListUsers" asp-route-id="@Model.UserGroup.Group.IdGroup" asp-controller="User">Users list</a><br>
-
+<a asp-action="ListUsers" asp-route-id="@Model.UserGroup.Group.IdGroup" asp-controller="User">Users list</a><br>
+<a asp-action="ListRules" asp-controller="Group" asp-route-idGroup="@Model.UserGroup.Group.IdGroup">Rules list</a><br>
+<a asp-action="CreateStatement" asp-route-id="@Model.UserGroup.Group.IdGroup" asp-controller="Group">will change</a><br>
+<a asp-action="ListScheduleStatement" asp-route-id="@Model.UserGroup.Group.IdGroup" asp-controller="Group">list change</a><br>
 
 <br>
 @{
     if (Model.UserGroup.IsAdmin)
     {
         <a asp-action="CreateMission" asp-route-id="@Model.UserGroup.Group.IdGroup" asp-controller="Mission">Create task</a><br>
-    }
-}
-
-<br>
-@{
-    if (Model.UserGroup.IsAdmin)
-    {
+        <a asp-action="CreateRule" asp-controller="Group" asp-route-id="@Model.UserGroup.Group.IdGroup">Create rule</a><br>
         <a asp-action="InviteUser" asp-controller="User" asp-route-id="@Model.UserGroup.Group.IdGroup">Invite user</a><br>
     }
 }
-
-<a asp-action="CreateStatement" asp-route-id="@Model.UserGroup.Group.IdGroup" asp-controller="Group">will change</a><br>
-
-<a asp-action="ListScheduleStatement" asp-route-id="@Model.UserGroup.Group.IdGroup" asp-controller="Group">list change</a><br>
 
 <form>
     <div>
@@ -44,13 +36,16 @@
 
 <br><br><h3>Дежурства на 30 дней</h3>
 @{
-   // Dictionary<DateTime, User> list = Model.UserGroup.Group.CalculateToDate(DateTime.Now.Date.AddDays(30));
     ArrayList list = Model.UserGroup.Group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+    var listRules = Model.UserGroup.Group.Rules.ToList();
     foreach (UserDateTime item in list)
     {
         var a = Model.ScheduleChanges.FirstOrDefault(x => x.AfterUserDate == item.DateTime);
         var b = Model.ScheduleChanges.FirstOrDefault(x => x.BeforeUserDate == item.DateTime);
-        
+        int indexDayOfWeek = (int) item.DateTime.DayOfWeek;
+        var rule = listRules.FirstOrDefault(x => x.Days.Contains(indexDayOfWeek));
+
+
         if (a != null)
         {
             <h6>
@@ -67,7 +62,14 @@
         }
         else
         {
-            <h6>Date: @item.DateTime.ToShortDateString() user: @item.User.FirstName  @item.User.SecondName</h6>
+            if (rule != null)
+            {
+                <h6>Date: @item.DateTime.ToShortDateString() user: @rule.User.FirstName  @rule.User.SecondName</h6>
+            }
+            else
+            {
+                <h6>Date: @item.DateTime.ToShortDateString() user: @item.User.FirstName  @item.User.SecondName</h6>
+            }
         }
     }
 }

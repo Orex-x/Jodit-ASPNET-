@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Jodit.Models;
 using Jodit.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace Jodit.Controllers
@@ -36,6 +37,92 @@ namespace Jodit.Controllers
         }
 
         public IActionResult CreateGroup() => View();
+
+        public IActionResult ListRules(int idGroup)
+        {
+            var group = db.Groups
+                .Include(x => x.Rules)
+                .ThenInclude(x => x.User)
+                .FirstOrDefault(x => x.IdGroup == idGroup);
+
+            return View(group.Rules);
+
+        }
+
+        public IActionResult CreateRule(int id)
+        {
+            var group = db.Groups
+                .Include(x => x.Users)
+                .FirstOrDefault(x => x.IdGroup == id);
+            
+            SelectList users = new SelectList(group.Users, "IdUser", "FirstName");
+            ViewBag.Users = users;
+
+            RuleViewModel model = new RuleViewModel()
+            {
+                daysOfTheWeek = new Dictionary<string, bool>()
+                {
+                    {"Sunday", false},
+                    {"Mondey", false},
+                    {"Tuesday", false},
+                    {"Wednesday", false},
+                    {"Thursday", false},
+                    {"Friday", false},
+                    {"Saturday", false},
+                },
+                IdGroup = id
+            };
+            return View(model);
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> CreateRule(RuleViewModel model)
+        {
+
+            if (ModelState.IsValid)
+            {
+                Dictionary<string, int> dic = new Dictionary<string, int>() {
+
+                    {"Sunday", 0},
+                    {"Mondey", 1},
+                    {"Tuesday", 2},
+                    {"Wednesday", 3},
+                    {"Thursday", 4},
+                    {"Friday", 5},
+                    {"Saturday", 6},
+                };
+
+                
+                bool update = true;
+                var group = await db.Groups
+                    .Include(x => x.Rules)
+                    .ThenInclude(x => x.User)
+                    .FirstOrDefaultAsync(x => x.IdGroup == model.IdGroup);
+                  
+                Rule rule = group.Rules.FirstOrDefault(x => x.User.IdUser == model.IdUser);
+
+                if (rule == null)
+                {
+                    rule = new Rule();
+                    update = false;
+                }
+                
+                rule.Days.Clear();
+                foreach (var item in model.daysOfTheWeek)
+                {
+                    if(item.Value)
+                        rule.Days.Add(dic[item.Key]);
+                }
+                
+                if (!update)
+                {
+                    rule.User = await db.Users.FirstOrDefaultAsync(x => x.IdUser == model.IdUser);
+                    group.Rules.Add(rule);
+                }
+                await db.SaveChangesAsync();
+            }
+            return RedirectToAction("ListGroups", "Group");
+        }
         
         
          [HttpPost]
@@ -210,6 +297,9 @@ namespace Jodit.Controllers
 
                  var userGroup = await db.UserGroups
                      .Where(i => i.Group.IdGroup == id)
+                     .Include(x => x.Group)
+                     .ThenInclude(x => x.Rules)
+                     .ThenInclude(x => x.User)
                      .FirstOrDefaultAsync(i => i.User.IdUser == user.IdUser);
                  
                  if (userGroup != null)

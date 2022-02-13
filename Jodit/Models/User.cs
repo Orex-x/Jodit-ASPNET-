@@ -41,31 +41,29 @@ namespace Jodit.Models
         
         // GroupInvite
         [InverseProperty("InvitedUser")]
-        public ICollection<GroupInvite> GroupInvitations { get; set; }  
-        
+        public ICollection<GroupInvite> GroupInvitations { get; set; } = new List<GroupInvite>();
+
         [InverseProperty("InvitingUser")]
-        public ICollection<GroupInvite> GroupApplications { get; set; }
+        public ICollection<GroupInvite> GroupApplications { get; set; } = new List<GroupInvite>();
         
         
         // UserJoditTask
-        [InverseProperty("Author")]
-        public ICollection<UserMission> Authors { get; set; }
-        
-        [InverseProperty("Executor")]
-        public ICollection<UserMission> Executors { get; set; }
+        [InverseProperty("Author")] public ICollection<UserMission> Authors { get; set; } = new List<UserMission>();
+
+        [InverseProperty("Executor")] public ICollection<UserMission> Executors { get; set; } = new List<UserMission>();
         
         
         // ScheduleChange
         [InverseProperty("BeforeUser")]
-        public ICollection<ScheduleChange> ScheduleChangesBeforeUsers { get; set; } 
-        
+        public ICollection<ScheduleChange> ScheduleChangesBeforeUsers { get; set; } = new List<ScheduleChange>();
+
         [InverseProperty("AfterUser")]
-        public ICollection<ScheduleChange> ScheduleChangesAfterUsers { get; set; }
+        public ICollection<ScheduleChange> ScheduleChangesAfterUsers { get; set; } = new List<ScheduleChange>();
         
         
         // ScheduleStatement
         [InverseProperty("BeforeUser")]
-        public ICollection<ScheduleStatement> BeforeUsers { get; set; }
-   
+        public ICollection<ScheduleStatement> BeforeUsers { get; set; } = new List<ScheduleStatement>();
+
     }
 }

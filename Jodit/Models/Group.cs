@@ -23,11 +23,13 @@ namespace Jodit.Models
 
         public virtual ICollection<User> Users { get; set; } = new List<User>();
         
-        public virtual List<UserGroup> UserGroups { get; set; } = new List<UserGroup>();
+        public virtual List<UserGroup> UserGroups { get; set; } = new List<UserGroup>(); 
         
-        public virtual ICollection<ScheduleChange> ScheduleChanges { get; set; }
-        
-        public virtual ICollection<ScheduleStatement> ScheduleStatements { get; set; }
+        public virtual List<Rule> Rules { get; set; } = new List<Rule>();
+
+        public virtual ICollection<ScheduleChange> ScheduleChanges { get; set; } = new List<ScheduleChange>();
+
+        public virtual ICollection<ScheduleStatement> ScheduleStatements { get; set; } = new List<ScheduleStatement>();
 
 
         public ArrayList CalculateToDate(DateTime date)

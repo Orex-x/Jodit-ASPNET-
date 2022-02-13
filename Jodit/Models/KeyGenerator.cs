@@ -17,7 +17,7 @@ namespace Jodit.Models
  
             for (int i=0; i<25; i++)
             {
-                str += (char) rnd.Next(0, bigString.Length-1);
+                str += bigString[rnd.Next(0, bigString.Length-1)];
             }
             return str;
         }

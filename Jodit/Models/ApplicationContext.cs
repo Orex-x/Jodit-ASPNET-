@@ -25,6 +25,8 @@ namespace Jodit.Models
         
         public DbSet<UserSession> UserSessions { get; set; }
         
+        public DbSet<Rule> Rules { get; set; }
+        
         public DbSet<UserChatID> UserChatIds { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options)

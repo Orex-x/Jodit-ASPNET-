@@ -1,0 +1,25 @@
+@model Jodit.ViewModels.RuleViewModel
+
+@{
+    Layout = null;
+}
+
+
+<form asp-action="CreateRule" asp-controller="Group">
+    
+    <h3>Select user</h3>
+    @Html.HiddenFor(model => model.IdGroup)
+    
+    @Html.DropDownListFor(model => model.IdUser, ViewBag.Users as SelectList)
+    <h3>who will be on duty only in</h3>
+    @{
+        foreach (var item in Model.daysOfTheWeek)
+        {
+            <h4>@item.Key @Html.CheckBoxFor(x => x.daysOfTheWeek[item.Key])</h4> 
+        }
+    }
+    
+    <div class= "form-group">
+        <input type="submit" value="Create" class="btn btn-default">
+    </div>
+</form>

@@ -1,0 +1,18 @@
+@model List<Rule>
+
+@{
+    Layout = null;
+}
+
+@{
+    foreach (var item in Model)
+    {
+        <h2>User: @item.User.FirstName</h2>
+        <h3>on duty only</h3>
+        foreach (var itemDay in item.Days)
+        {
+            <h3>@itemDay</h3>
+        }
+    }
+}
+
