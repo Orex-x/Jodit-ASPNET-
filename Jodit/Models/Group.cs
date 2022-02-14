@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Jodit.Models
 {
@@ -23,6 +24,9 @@ namespace Jodit.Models
 
         public virtual ICollection<User> Users { get; set; } = new List<User>();
         
+        [NotMapped]
+        public virtual ICollection<User> UsersWithoutRules { get; set; } = new List<User>();
+        
         public virtual List<UserGroup> UserGroups { get; set; } = new List<UserGroup>(); 
         
         public virtual List<Rule> Rules { get; set; } = new List<Rule>();
@@ -36,11 +40,21 @@ namespace Jodit.Models
         {
             ArrayList list = new ArrayList();
             DateTime now = DateTime.Now.Date;
+            
+            UsersWithoutRules.Clear();
+
+            foreach (var item in Users)
+            {
+                if (Rules.FirstOrDefault(x => x.User.IdUser == item.IdUser) == null)
+                {
+                    UsersWithoutRules.Add(item);
+                }
+            }
+            
             while (now != date)
             {
                 var i = Calculate(now);
-                User user = Users.ToList()[i];
-                //list.Add("Date: " + now.ToShortDateString() + " user: " + user.FirstName + " " + user.SecondName);
+                User user = UsersWithoutRules.ToList()[i];
                 list.Add(new UserDateTime() { User = user, DateTime = now, userName = user.FirstName });
                 now = now.AddDays(1);
             }
@@ -49,11 +63,19 @@ namespace Jodit.Models
 
         public UserDateTime CalculateByDate(DateTime date)
         {
+            UsersWithoutRules.Clear();
+
+            foreach (var item in Users)
+            {
+                if (Rules.FirstOrDefault(x => x.User.IdUser == item.IdUser) == null)
+                {
+                    UsersWithoutRules.Add(item);
+                }
+            }
+
             var i = Calculate(date);
-            User user = Users.ToList()[i];
+            User user = UsersWithoutRules.ToList()[i];
             return new UserDateTime() { User = user, DateTime = date };
-            //  return new Dictionary<DateTime, User> { {date, user} };
-            //  return "Date: " + date.ToShortDateString() + " user: " + user.FirstName + " " + user.SecondName;
         }
 
         public int Calculate(DateTime date)
@@ -61,11 +83,12 @@ namespace Jodit.Models
             // Считаю разницу в днях 
             var a = (int)(date - DateOfCreation).TotalDays;
             // Считаю n полных циклов дежурств прошло с момента создания группы
-            var b = a / Users.Count;
+            var b = a / UsersWithoutRules.Count;
             // Считаю количесвто дней, необходимых для прохождения n полных циклов
-            var c = b * Users.Count;
+            var c = b * UsersWithoutRules.Count;
             //нахожу разницу
             var d = a - c;
+            //возвращаю индекс пользователя
             return d;
         }
 
