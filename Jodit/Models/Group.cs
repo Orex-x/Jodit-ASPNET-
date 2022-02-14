@@ -36,78 +36,183 @@ namespace Jodit.Models
         public virtual ICollection<ScheduleStatement> ScheduleStatements { get; set; } = new List<ScheduleStatement>();
 
         
-        public List<User> CalculateToDateTest(DateTime date)
+
+        public UserDateTime CalculateByDate(DateTime date)
         {
-            var list = new List<User>();
-            DateTime now = DateTime.Now.Date;
+            
+            var after = ScheduleChanges
+                .FirstOrDefault(x => x.AfterUserDate == date);
+            var before = ScheduleChanges
+                .FirstOrDefault(x => x.BeforeUserDate == date);
+            int indexDayOfWeek = (int) date.DayOfWeek;
+            var rule = Rules.FirstOrDefault(x => x.Days.Contains(indexDayOfWeek));
+            
+            
+            if (after != null)
+            {
+                return new UserDateTime()
+                {
+                    User = after.BeforeUser,
+                    userName = after.BeforeUser.FirstName,
+                    DateTime = date
+                };
+            }
+            if (before != null)
+            {
+                return new UserDateTime()
+                {
+                    User = after.AfterUser,
+                    userName = after.AfterUser.FirstName,
+                    DateTime = date
+                };
+            }
+            if (rule != null)
+            {
+                return new UserDateTime()
+                {
+                    User = rule.User,
+                    userName = rule.User.FirstName,
+                    DateTime = date
+                };
+            }
+            
+            
             
             UsersWithoutRules.Clear();
-
             foreach (var item in UserGroups)
                 if (Rules.FirstOrDefault(x => x.User.IdUser == item.User.IdUser) == null
                     && !item.IsAdmin)
                     UsersWithoutRules.Add(item.User);
-            
-            
+
+            var colStatDays = 0;
+            DateTime now = DateTime.Now.Date;
             while (now != date)
             {
-                var i = Calculate(now);
-                User user = UsersWithoutRules.ToList()[i];
-                list.Add(user);
+                if (Rules.FirstOrDefault(x => x.Days.Contains((int) now.DayOfWeek)) != null)
+                    colStatDays++;
+                
                 now = now.AddDays(1);
             }
-            return list;
+            
+            var a = (int)(date - DateOfCreation).TotalDays;
+            a -= colStatDays;
+            var b = a % UsersWithoutRules.Count;
+            
+            User u = UsersWithoutRules.ToList()[b];
+            if (u != null)
+            {
+                UserDateTime us = new UserDateTime()
+                {
+                    User = u,
+                    userName = u.FirstName,
+                    DateTime = date
+                };
+                return us;
+            }
+            return new UserDateTime();
         }
 
-        public List<UserDateTime> CalculateToDate(DateTime date)
+
+        
+        public List<UserDateTime> CreateSchedule(DateTime date)
         {
             var list = new List<UserDateTime>();
             DateTime now = DateTime.Now.Date;
             
-            UsersWithoutRules.Clear();
-
-            foreach (var item in UserGroups)
-                if (Rules.FirstOrDefault(x => x.User.IdUser == item.User.IdUser) == null
-                && !item.IsAdmin)
-                    UsersWithoutRules.Add(item.User);
             
-            
-            while (now != date)
-            {
-                var i = Calculate(now);
-                User user = UsersWithoutRules.ToList()[i];
-                list.Add(new UserDateTime() { User = user, DateTime = now, userName = user.FirstName });
-                now = now.AddDays(1);
-            }
-            return list;
-        }
-
-        public UserDateTime CalculateByDate(DateTime date)
-        {
+            //лист для хранения пользователей у которых нет правил
             UsersWithoutRules.Clear();
-
             foreach (var item in UserGroups)
                 if (Rules.FirstOrDefault(x => x.User.IdUser == item.User.IdUser) == null
                     && !item.IsAdmin)
                     UsersWithoutRules.Add(item.User);
 
-            var i = Calculate(date);
-            User user = UsersWithoutRules.ToList()[i];
-            return new UserDateTime() { User = user, DateTime = date };
+
+            if (UsersWithoutRules.Count > 0)
+            {
+                var userList = new List<User>();
+                while (now != date)
+                {
+                    var i = Calculate(now);
+                    User user = UsersWithoutRules.ToList()[i];
+                    userList.Add(user);
+                    now = now.AddDays(1);
+                }
+                now = DateTime.Now.Date;
+               
+                
+                for (int i = 0; i < userList.Count; i++, now = now.AddDays(1))
+                {
+                    var a = ScheduleChanges
+                        .FirstOrDefault(x => x.AfterUserDate == now);
+                    var b = ScheduleChanges
+                        .FirstOrDefault(x => x.BeforeUserDate == now);
+                    
+                    int indexDayOfWeek = (int) now.DayOfWeek;
+                    var rule = Rules.FirstOrDefault(x => x.Days.Contains(indexDayOfWeek));
+                    if (a != null)
+                    {
+                        list.Add(new UserDateTime()
+                        {
+                            User = a.BeforeUser,
+                            userName = a.BeforeUser.FirstName,
+                            DateTime = now
+                        });
+                    }
+                    else if (b != null)
+                    {
+                        list.Add(new UserDateTime()
+                        {
+                            User = b.AfterUser,
+                            userName = b.AfterUser.FirstName,
+                            DateTime = now
+                        });
+                    }
+                    else
+                    {
+                        if (rule != null)
+                        {
+                            list.Add(new UserDateTime()
+                            {
+                                User = rule.User,
+                                userName = rule.User.FirstName,
+                                DateTime = now
+                            });
+                            i--;
+                        }
+                        else
+                        {
+                            list.Add(new UserDateTime()
+                            {
+                                User = userList[i],
+                                userName = userList[i].FirstName,
+                                DateTime = now
+                            });
+                        }
+                    }
+                    
+                }
+            }
+            else
+                return new List<UserDateTime>();
+            
+            return list;
         }
+        
+        
 
         public int Calculate(DateTime date)
         {
-            // Считаю разницу в днях 
-            var a = (int)(date - DateOfCreation).TotalDays;
-            // Считаю n полных циклов дежурств прошло с момента создания группы
-            var b = a / UsersWithoutRules.Count;
-            // Считаю количесвто дней, необходимых для прохождения n полных циклов
-            var c = b * UsersWithoutRules.Count;
-            //нахожу разницу
-            var d = a - c;
-            //возвращаю индекс пользователя
-            return d;
+            try
+            {
+                var a = (int)(date - DateOfCreation).TotalDays;
+                var b = a % UsersWithoutRules.Count;
+                return b;
+            }
+            catch (DivideByZeroException)
+            {
+                return 0;
+            }
         }
 
     }

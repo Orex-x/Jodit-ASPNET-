@@ -314,7 +314,7 @@ namespace Jodit.api
                         .ThenInclude(x => x.User)
                         .FirstOrDefault(gr => gr.IdGroup == idGroup);
               
-                    List<UserDateTime> list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+                    List<UserDateTime> list = group.CreateSchedule(DateTime.Now.Date.AddDays(30));
                     return list;
                 }
                 catch (Exception ee)
@@ -341,7 +341,7 @@ namespace Jodit.api
                     .ThenInclude(x => x.User)
                     .FirstOrDefault(gr => gr.IdGroup == idGroup);
 
-                List<UserDateTime> list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+                List<UserDateTime> list = group.CreateSchedule(DateTime.Now.Date.AddDays(30));
                 var listBuf = new ArrayList();
                 foreach (UserDateTime item in list)
                     if (item.User.IdUser == user.IdUser)

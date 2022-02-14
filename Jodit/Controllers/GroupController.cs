@@ -156,7 +156,7 @@ namespace Jodit.Controllers
            
 
             //  Dictionary<DateTime, User> dictionary = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
-            List<UserDateTime> list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+            List<UserDateTime> list = group.CreateSchedule(DateTime.Now.Date.AddDays(30));
             var listBuf = new ArrayList();
             foreach (UserDateTime item in list)
             {
@@ -215,7 +215,7 @@ namespace Jodit.Controllers
            
 
             // Dictionary<DateTime, User> dictionary = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
-            List<UserDateTime> list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+            List<UserDateTime> list = group.CreateSchedule(DateTime.Now.Date.AddDays(30));
             var listBuf = new ArrayList();
             foreach (UserDateTime item in list)
             {
