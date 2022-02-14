@@ -40,8 +40,10 @@
     var listRules = Model.UserGroup.Group.Rules.ToList();
     foreach (UserDateTime item in list)
     {
-        var a = Model.ScheduleChanges.FirstOrDefault(x => x.AfterUserDate == item.DateTime);
-        var b = Model.ScheduleChanges.FirstOrDefault(x => x.BeforeUserDate == item.DateTime);
+        var a = Model.ScheduleChanges
+            .FirstOrDefault(x => x.AfterUserDate == item.DateTime);
+        var b = Model.ScheduleChanges
+            .FirstOrDefault(x => x.BeforeUserDate == item.DateTime);
         int indexDayOfWeek = (int) item.DateTime.DayOfWeek;
         var rule = listRules.FirstOrDefault(x => x.Days.Contains(indexDayOfWeek));
 

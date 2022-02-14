@@ -5,7 +5,7 @@ using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 
 namespace Jodit.Models
 {
-    public class ApplicationContext  : DbContext
+    public class ApplicationContext : DbContext
     {
         public DbSet<User> Users { get; set; }
         

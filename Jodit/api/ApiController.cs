@@ -20,7 +20,7 @@ namespace Jodit.api
         {
             db = context;
         }
-        
+
         [HttpGet]
         [Route("GetUserAPI")]
         public User GetUserAPI(string idSession)
@@ -603,12 +603,26 @@ namespace Jodit.api
         {
             Group group = db.Groups
                 .Include(x => x.Users)
+                .Include(x => x.ScheduleChanges)
                 .FirstOrDefault(x => x.IdGroup == idGroup);
 
-            var g = db.UserGroups
-                .Include(x => x.Group)
-                .ThenInclude(x => x.Users)
-                .FirstOrDefault(x => x.Group.IdGroup == idGroup);
+            var listListChange = group.ScheduleChanges.ToList();
+            
+            var a = listListChange
+                .FirstOrDefault(x => x.AfterUserDate == DateTime.Now);
+            var b = listListChange
+                .FirstOrDefault(x => x.BeforeUserDate == DateTime.Now);
+
+            
+            if (a != null)
+            {
+                return a.BeforeUser.FirstName + " " + a.BeforeUser.LastName;
+            }
+            
+            if (b != null)
+            {
+                return a.AfterUser.FirstName + " " + a.AfterUser.LastName;
+            }
             
             var UserDateTime = group.CalculateByDate(DateTime.Now);
             return UserDateTime.User.FirstName +  " " + UserDateTime.User.LastName;
@@ -624,7 +638,7 @@ namespace Jodit.api
                 .Include(x => x.User)
                 .ThenInclude(x => x.Groups)
                 .FirstOrDefault(x => x.ChatID.Equals(idChat));
-            if (userChatId == null)
+            if (userChatId != null)
             {
                 foreach (var item in userChatId.User.Groups.ToList())
                 {
@@ -644,10 +658,24 @@ namespace Jodit.api
         {
             try
             {
-                UserChatID userChatId = db.UserChatIds.FirstOrDefault(x => x.Key.Equals(key));
-                userChatId.ChatID = idChat;
-                userChatId.Key = null;
-                db.SaveChanges();
+                UserChatID userChat = db.UserChatIds
+                    .FirstOrDefault(x => x.Key.Equals(key));
+                if (userChat != null)
+                {
+                    UserChatID userChatOld = db.UserChatIds
+                        .FirstOrDefault(x => x.ChatID.Equals(idChat));
+                    if (userChatOld != null)
+                        db.UserChatIds.Remove(userChatOld);
+
+
+
+                    userChat.Key = null;
+                    userChat.ChatID = idChat;
+                    db.UserChatIds.Update(userChat);
+                    db.SaveChanges();
+                }
+                else
+                    return false;
                 return true;    
             }catch(Exception e){}
             return false;

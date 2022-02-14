@@ -54,7 +54,9 @@ namespace Jodit.Controllers
                        Email = model.Email,
                    };
                    user.UserPassword = hasher.HashPassword(user, model.Password);
-                   await Authenticate(user.Email); 
+                   await Authenticate(user.Email);
+                   
+                   
                    db.Users.Add(user);
                    db.SaveChanges();
                    return RedirectToAction("Account", "Account");
@@ -114,8 +116,7 @@ namespace Jodit.Controllers
                 .Include(x => x.UserGroups)
                 .ThenInclude(x => x.Group)
                 .FirstOrDefault(u => u.Email == userName);
-            
-            
+                
             AccountModel model = new AccountModel()
             {
                 user = user
