@@ -148,13 +148,15 @@ namespace Jodit.Controllers
         {
             var userName = User.Identity.Name;
             User user = db.Users.FirstOrDefault(i => i.Email == userName);
-            Group group = db.Groups.FirstOrDefault(gr => gr.IdGroup == id);
-            db.Entry(group)
-                .Collection(c => c.Users)
-                .Load();
+            Group group = db.Groups
+                .Include(x => x.Users)
+                .Include(x => x.UserGroups)
+                .ThenInclude(x => x.User)
+                .FirstOrDefault(gr => gr.IdGroup == id);
+           
 
             //  Dictionary<DateTime, User> dictionary = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
-            ArrayList list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+            List<UserDateTime> list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
             var listBuf = new ArrayList();
             foreach (UserDateTime item in list)
             {
@@ -205,13 +207,15 @@ namespace Jodit.Controllers
             var userName = User.Identity.Name;
             User user = db.Users.FirstOrDefault(i => i.Email == userName);
             User userBefore = db.Users.FirstOrDefault(i => i.IdUser == idUserBefore);
-            Group group = db.Groups.FirstOrDefault(gr => gr.IdGroup == idGroup);
-            db.Entry(group)
-                .Collection(c => c.Users)
-                .Load();
+            Group group = db.Groups
+                .Include(x => x.Users)
+                .Include(x => x.UserGroups)
+                .ThenInclude(x => x.User)
+                .FirstOrDefault(gr => gr.IdGroup == idGroup);
+           
 
             // Dictionary<DateTime, User> dictionary = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
-            ArrayList list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+            List<UserDateTime> list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
             var listBuf = new ArrayList();
             foreach (UserDateTime item in list)
             {
@@ -292,6 +296,8 @@ namespace Jodit.Controllers
                  User user = db.Users.FirstOrDefault(i => i.Email == userName);
                  Group group = await db.Groups
                      .Include(x => x.Users)
+                     .Include(x => x.UserGroups)
+                     .ThenInclude(x => x.User)
                      .Include(x => x.ScheduleChanges)
                      .FirstOrDefaultAsync(gr => gr.IdGroup == id);
 

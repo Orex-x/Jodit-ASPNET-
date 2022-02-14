@@ -35,21 +35,42 @@ namespace Jodit.Models
 
         public virtual ICollection<ScheduleStatement> ScheduleStatements { get; set; } = new List<ScheduleStatement>();
 
-
-        public ArrayList CalculateToDate(DateTime date)
+        
+        public List<User> CalculateToDateTest(DateTime date)
         {
-            ArrayList list = new ArrayList();
+            var list = new List<User>();
             DateTime now = DateTime.Now.Date;
             
             UsersWithoutRules.Clear();
 
-            foreach (var item in Users)
+            foreach (var item in UserGroups)
+                if (Rules.FirstOrDefault(x => x.User.IdUser == item.User.IdUser) == null
+                    && !item.IsAdmin)
+                    UsersWithoutRules.Add(item.User);
+            
+            
+            while (now != date)
             {
-                if (Rules.FirstOrDefault(x => x.User.IdUser == item.IdUser) == null)
-                {
-                    UsersWithoutRules.Add(item);
-                }
+                var i = Calculate(now);
+                User user = UsersWithoutRules.ToList()[i];
+                list.Add(user);
+                now = now.AddDays(1);
             }
+            return list;
+        }
+
+        public List<UserDateTime> CalculateToDate(DateTime date)
+        {
+            var list = new List<UserDateTime>();
+            DateTime now = DateTime.Now.Date;
+            
+            UsersWithoutRules.Clear();
+
+            foreach (var item in UserGroups)
+                if (Rules.FirstOrDefault(x => x.User.IdUser == item.User.IdUser) == null
+                && !item.IsAdmin)
+                    UsersWithoutRules.Add(item.User);
+            
             
             while (now != date)
             {
@@ -65,13 +86,10 @@ namespace Jodit.Models
         {
             UsersWithoutRules.Clear();
 
-            foreach (var item in Users)
-            {
-                if (Rules.FirstOrDefault(x => x.User.IdUser == item.IdUser) == null)
-                {
-                    UsersWithoutRules.Add(item);
-                }
-            }
+            foreach (var item in UserGroups)
+                if (Rules.FirstOrDefault(x => x.User.IdUser == item.User.IdUser) == null
+                    && !item.IsAdmin)
+                    UsersWithoutRules.Add(item.User);
 
             var i = Calculate(date);
             User user = UsersWithoutRules.ToList()[i];

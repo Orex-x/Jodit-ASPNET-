@@ -301,28 +301,28 @@ namespace Jodit.api
        
         [HttpGet]
         [Route("GetSchedule")]
-        public ArrayList GetSchedule(int idGroup, string idSession)
+        public List<UserDateTime> GetSchedule(int idGroup, string idSession)
         {
             UserSession session = db.UserSessions.FirstOrDefault(x => x.IdSession == idSession);
             if (session != null)
             {
                 try
                 {
-                    Group group = db.Groups.FirstOrDefault(gr => gr.IdGroup == idGroup);
-                    db.Entry(group)
-                        .Collection(c => c.Users)
-                        .Load();
-
-                    ArrayList list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+                    Group group = db.Groups
+                        .Include(x => x.Users)
+                        .Include(x => x.UserGroups)
+                        .ThenInclude(x => x.User)
+                        .FirstOrDefault(gr => gr.IdGroup == idGroup);
+              
+                    List<UserDateTime> list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
                     return list;
-
                 }
                 catch (Exception ee)
                 {
 
                 }
             }
-            return new ArrayList();
+            return new List<UserDateTime>();
         }
 
         [HttpGet]
@@ -335,23 +335,18 @@ namespace Jodit.api
             {
                 var user = db.Users.FirstOrDefault(u => u.IdUser == session.User.IdUser);
 
-                Group group = db.Groups.FirstOrDefault(gr => gr.IdGroup == idGroup);
+                Group group = db.Groups
+                    .Include(x => x.Users)
+                    .Include(x => x.UserGroups)
+                    .ThenInclude(x => x.User)
+                    .FirstOrDefault(gr => gr.IdGroup == idGroup);
 
-
-                db.Entry(group)
-                    .Collection(c => c.Users)
-                    .Load();
-
-                ArrayList list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+                List<UserDateTime> list = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
                 var listBuf = new ArrayList();
                 foreach (UserDateTime item in list)
-                {
                     if (item.User.IdUser == user.IdUser)
-                    {
                         listBuf.Add(item.DateTime);
-                    }
-                }
-
+                
                 return listBuf;
             }
             return new ArrayList();
@@ -603,6 +598,8 @@ namespace Jodit.api
         {
             Group group = db.Groups
                 .Include(x => x.Users)
+                .Include(x => x.UserGroups)
+                .ThenInclude(x => x.User)
                 .Include(x => x.ScheduleChanges)
                 .FirstOrDefault(x => x.IdGroup == idGroup);
 

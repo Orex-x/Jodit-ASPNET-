@@ -36,41 +36,57 @@
 
 <br><br><h3>Дежурства на 30 дней</h3>
 @{
-    ArrayList list = Model.UserGroup.Group.CalculateToDate(DateTime.Now.Date.AddDays(30));
+    DateTime now = DateTime.Now.Date;
+    List<User> list = Model.UserGroup.Group
+        .CalculateToDateTest(now.AddDays(30));
     var listRules = Model.UserGroup.Group.Rules.ToList();
-    foreach (UserDateTime item in list)
+   
+   
+    for (int i = 0; i < list.Count; i++, now = now.AddDays(1))
     {
+        
         var a = Model.ScheduleChanges
-            .FirstOrDefault(x => x.AfterUserDate == item.DateTime);
+            .FirstOrDefault(x => x.AfterUserDate == now);
         var b = Model.ScheduleChanges
-            .FirstOrDefault(x => x.BeforeUserDate == item.DateTime);
-        int indexDayOfWeek = (int) item.DateTime.DayOfWeek;
+            .FirstOrDefault(x => x.BeforeUserDate == now);
+        int indexDayOfWeek = (int) now.DayOfWeek;
         var rule = listRules.FirstOrDefault(x => x.Days.Contains(indexDayOfWeek));
 
 
         if (a != null)
         {
             <h6>
-                Date: @item.DateTime.ToShortDateString()
+                Date: @now.ToShortDateString()
                 user: @a.BeforeUser.FirstName @a.BeforeUser.SecondName
+                day of the week: @now.DayOfWeek
             </h6>
         }
         else if (b != null)
         {
             <h6>
-                Date: @item.DateTime.ToShortDateString()
+                Date: @now.ToShortDateString()
                 user: @b.AfterUser.FirstName @b.AfterUser.SecondName
+                day of the week: @now.DayOfWeek
             </h6>
         }
         else
         {
             if (rule != null)
             {
-                <h6>Date: @item.DateTime.ToShortDateString() user: @rule.User.FirstName  @rule.User.SecondName</h6>
+                <h6>
+                    Date: @now.ToShortDateString()
+                    user: @rule.User.FirstName @rule.User.SecondName
+                    day of the week: @now.DayOfWeek
+                </h6>
+                i--;
             }
             else
             {
-                <h6>Date: @item.DateTime.ToShortDateString() user: @item.User.FirstName  @item.User.SecondName</h6>
+                <h6>
+                    Date: @now.ToShortDateString() 
+                    user: @list[i].FirstName @list[i].SecondName
+                    day of the week: @now.DayOfWeek
+                </h6>
             }
         }
     }
