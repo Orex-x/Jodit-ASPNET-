@@ -1,0 +1,22 @@
+version: "3.7"
+
+services:
+  aspnet:
+    image: jodit-aspnet
+    build: 
+      context: .
+      dockerfile: Jodit/Dockerfile
+    ports:
+      - 5101:5000
+      - 5111:80
+      - 5112:443
+    environment:
+      - "ASPNETCORE_URLS=http://+"
+    depends_on:
+      - postgres-db
+
+
+  postgres-db:
+    image: postgres
+    volumes:
+      - ./.docker/postgres/data:/var/lib/postgresql/data
