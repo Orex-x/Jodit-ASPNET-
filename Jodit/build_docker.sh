@@ -1,0 +1,1 @@
+docker build -t jodit-aspnet$1 -f Dockerfile .

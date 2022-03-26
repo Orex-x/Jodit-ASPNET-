@@ -1,0 +1,15 @@
+version: "3.7"
+
+services:
+  aspnet:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Container
+
+  postgres-db:
+    environment:
+      - POSTGRES_USER=jodit_dev
+      - POSTGRES_PASSWORD=jodit_dev
+      - POSTGRES_DB=jodit_dev
+    ports:
+      - 5102:5432
+      # - 5432:5432
