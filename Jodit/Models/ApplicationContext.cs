@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 
@@ -34,6 +32,9 @@ namespace Jodit.Models
             Database.EnsureCreated();
         }
         
+        public static int idCurrentGroup;
+        public static bool isAdmin;
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.UseIdentityColumns();
@@ -58,8 +59,5 @@ namespace Jodit.Models
                         j.ToTable("jodit_user_group");
                     });
         }
-         
-      
-
     }
 }

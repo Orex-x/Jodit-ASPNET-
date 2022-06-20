@@ -1,19 +1,19 @@
-@model List<ScheduleStatement>
+@model Jodit.ViewModels.ListScheduleStatementViewModel
+@{
+    Layout = "_GroupNavigationLayout"; 
+    ViewData["IdGroup"] = Model.groupId;
+}
 
-<table class="table">
+<table class="table table-sm">
+    <thead class="thead-dark">
     <tr>
-        <td>
-            Comment
-        </td>
-        <td>
-            ReplacementDate
-        </td>
-        <td>
-            Action
-        </td>
-      
+        <th scope="col">Комментарий</th>
+        <th scope="col">Дата</th>
+        <th scope="col">Действия</th>
     </tr>
-    @foreach(var statement in Model)
+    </thead>
+    <tbody>
+    @foreach(var statement in Model.list)
     {
         <tr>
             <td>
@@ -22,13 +22,20 @@
             <td>
                 @statement.ReplacementDate.ToShortDateString()
             </td>
-          
             <td>
-                <a asp-action="CreateScheduleChange" asp-route-idGroup="@statement.Group.IdGroup" 
-                   asp-route-idUserBefore="@statement.BeforeUser.IdUser" 
-                   asp-route-idScheduleStatement="@statement.IdScheduleStatement"
-                   asp-controller="Group">Accept</a><br>
+                <div class="row">
+                    <div class="col">
+                        <a asp-action="CreateScheduleChange" asp-route-idGroup="@statement.Group.IdGroup"
+                           asp-route-idUserBefore="@statement.BeforeUser.IdUser"
+                           asp-route-idScheduleStatement="@statement.IdScheduleStatement"
+                           asp-controller="Group">
+                             <button class="btn btn-dark my-2">Принять</button>
+                        </a>
+                        
+                    </div>
+                </div>
             </td>
         </tr>
     }
+    </tbody>
 </table>

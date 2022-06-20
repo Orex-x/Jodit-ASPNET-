@@ -1,0 +1,45 @@
+@{
+    Layout = "_Layout";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewData["IdGroup"]</title>
+</head>
+<body>
+
+
+<section class="mt-5">
+    <div class="row">
+        <div class="col-lg-6 col-sm-12">
+            <div class="list-group m-4">
+                <a asp-action="Details" asp-controller="Group" asp-route-id="@ViewData["IdGroup"]" class="list-group-item list-group-item-action">Расписание</a>
+                <a asp-action="ListScheduleStatement" asp-route-id="@ViewData["IdGroup"]" asp-controller="Group" class="list-group-item list-group-item-action">Изменения в расписании</a>
+                <a asp-action="ListUsers" asp-route-id="@ViewData["IdGroup"]" asp-controller="User" class="list-group-item list-group-item-action">Пользователи</a>
+                <a asp-action="ListRules" asp-route-idGroup="@ViewData["IdGroup"]" asp-controller="Group" class="list-group-item list-group-item-action">Правила</a>
+            </div>
+            <div class="list-group m-4">
+                @{
+                    if (ApplicationContext.isAdmin)
+                    {
+                        <a asp-action="CreateMission" asp-route-id="@ViewData["IdGroup"]" asp-controller="Mission" class="list-group-item list-group-item-action">Создать задачу</a>
+                        <a asp-action="CreateRule" asp-controller="Group" asp-route-id="@ViewData["IdGroup"]" class="list-group-item list-group-item-action">Создать правило</a>
+                        <a asp-action="InviteUser" asp-controller="User" asp-route-id="@ViewData["IdGroup"]" class="list-group-item list-group-item-action">Пригласить пользователя</a>
+            
+                    }
+                    else
+                    {
+                        <a asp-action="CreateStatement" asp-route-id="@ViewData["IdGroup"]" asp-controller="Group" class="list-group-item list-group-item-action">Поменяться</a>
+                    } 
+                }
+            </div>
+        </div>
+        
+        <div class="col-lg-6 col-sm-12">
+            @RenderBody()
+        </div>
+    </div>
+</section>
+</body>
+</html>

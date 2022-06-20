@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Jodit.Models;
-using Microsoft.AspNetCore.Components.Forms;
 
 namespace Jodit.ViewModels
 {

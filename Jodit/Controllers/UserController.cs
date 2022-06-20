@@ -2,12 +2,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Jodit.Models;
 using Jodit.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 
 namespace Jodit.Controllers
 {
+    [Authorize]
     public class UserController : Controller
     {
         private ApplicationContext db;
@@ -25,7 +26,8 @@ namespace Jodit.Controllers
              
              UserModel model = new UserModel
              {
-                 Users = group.Users
+                 Users = group.Users,
+                 Group = group
              };
              return View(model);
          }

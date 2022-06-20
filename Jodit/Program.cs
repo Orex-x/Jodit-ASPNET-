@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace Jodit
 {
@@ -23,7 +17,7 @@ namespace Jodit
                 .ConfigureWebHostDefaults(
                     webBuilder =>
                     {
-                        webBuilder.UseUrls("https://localhost:5000");
+                        webBuilder.UseUrls("http://localhost:5001");
                         webBuilder.UseContentRoot(Directory.GetCurrentDirectory());
                         webBuilder.UseIISIntegration();
                         webBuilder.UseStartup<Startup>();

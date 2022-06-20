@@ -1,25 +1,28 @@
-@model Jodit.ViewModels.MissionModel 
+@model Jodit.ViewModels.MissionModel
+
+@{
+    Layout = "_GroupNavigationLayout";
+    ViewData["IdGroup"] = Model.Group.IdGroup;
+}
  
-<h2>Add mission</h2>
+<h2>Создать задачу</h2>
  
 
 <form asp-action="CreateMission" asp-controller="Mission">
     <div>
-        <label asp-for="Mission">Title</label><br />
+        <label asp-for="Mission">Сообщение</label><br />
         <input type="text" asp-for="Mission.Title" />
     </div>
     
     <div>
-        <label asp-for="Mission">Description</label><br />
+        <label asp-for="Mission">Описание</label><br />
         <input type="text" asp-for="Mission.Description" />
     </div>
     
     <div>
-        <label asp-for="Mission">Deadline</label><br />
+        <label asp-for="Mission">Дата сдачи</label><br />
         <input type="date" asp-for="Mission.Deadline" />
     </div>
-    
-   
     
     @{
         <ul>
@@ -38,6 +41,6 @@
     
     <input type="hidden" asp-for="@Model.Group.IdGroup" />
     <div class="form-group">
-        <input type="submit" value="Create" class="btn btn-default">
+        <input type="submit" value="Подтвердить" class="btn btn-default">
     </div>
 </form>

@@ -5,47 +5,71 @@
 }
 
 
-<table class="table">
-    <tr>
-        <td>
-            Group name
-        </td>
-        <td>
-            Description
-        </td>
-        <td>
-            Is private
-        </td>
-        <td>
-            Actions
-        </td>
-    </tr>
-    @foreach(var userGroup in Model.UserGroups)
-    {
-        <tr>
-            <td>
-                @userGroup.Group.GroupName
-            </td>
-            <td>
-                @userGroup.Group.Description
-            </td>
-            <td>
-                @userGroup.Group.IsPrivate
-            </td>
-            <td>
-                <a asp-action="Details" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup">Open</a>
-                @{
-                    if (userGroup.IsAdmin)
-                    {
-                        <a asp-action="Edit" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup">Edit</a>
-                        <a asp-action="Delete" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup">Delete</a>
-                    }
-                    else
-                    {
-                        <a asp-action="LeaveGroup" asp-controller="Group" asp-route-idUserGroup="@userGroup.IdUserGroup">Leave</a>
-                    }
-                }
-            </td>
-        </tr>
-    }
-</table>
+<div class="row mt-4 ml-4">
+    <div class="col-12">
+        <h2 class="color1">Список групп</h2>
+    </div>
+</div>
+       
+<div class="row ml-4 my-3">
+    <div class="col">
+        <a asp-action="createGroup" asp-controller="Group">
+            <button class="btn btn-dark my-2">Создать группу</button>
+        </a>
+    </div>
+</div>  
+<table class="table table-sm">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">Наименование</th>
+              <th scope="col">Описание</th>
+              <th scope="col">Дейтствие</th>
+            </tr>
+          </thead>
+          <tbody>
+          @foreach(var userGroup in Model.UserGroups)
+                  {
+                      <tr>
+                          <td>
+                              @userGroup.Group.GroupName
+                          </td>
+                          <td>
+                              @userGroup.Group.Description
+                          </td>
+                          <td>
+                              <div class="row ml-4 my-3">
+                                  <div class="col">
+                                      <a asp-action="Details" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup">
+                                          <button class="btn btn-dark my-2">Открыть</button> 
+                                      </a>
+                                  </div>
+                                  @{
+                                      if (userGroup.IsAdmin)
+                                      {
+                                          <div class="col">
+                                              <a asp-action="Edit" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup" >
+                                                  <button class="btn btn-outline-dark my-2">Изменить</button>
+                                              </a>
+                                          </div>
+                                          <div class="col">
+                                              <a asp-action="Delete" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup">
+                                                  <button class="btn btn-dark my-2">Удалить</button>
+                                              </a>
+                                          </div>
+                                      }
+                                      else
+                                      {
+                                          <div class="col">
+                                              <a asp-action="LeaveGroup" asp-controller="Group" asp-route-idUserGroup="@userGroup.IdUserGroup" >
+                                                  <button class="btn btn-dark my-2">Покинуть</button>
+                                              </a>
+                                          </div>
+                                      }
+                                 }
+                              </div>
+                          </td>
+                      </tr>
+                  }
+          </tbody>
+        </table>
+

@@ -1,17 +1,18 @@
 @model Jodit.ViewModels.RuleViewModel
 
 @{
-    Layout = null;
+    Layout = "_GroupNavigationLayout"; 
+    
+    ViewData["IdGroup"] = Model.IdGroup;
 }
-
 
 <form asp-action="CreateRule" asp-controller="Group">
     
-    <h3>Select user</h3>
+    <h3>Выберете пользователя</h3>
     @Html.HiddenFor(model => model.IdGroup)
     
     @Html.DropDownListFor(model => model.IdUser, ViewBag.Users as SelectList)
-    <h3>who will be on duty only in</h3>
+    <h3>Дежурит только в</h3>
     @{
         foreach (var item in Model.daysOfTheWeek)
         {
@@ -20,6 +21,6 @@
     }
     
     <div class= "form-group">
-        <input type="submit" value="Create" class="btn btn-default">
+        <input type="submit" value="Подтвердить" class="btn btn-default">
     </div>
 </form>

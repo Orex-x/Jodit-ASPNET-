@@ -1,4 +1,9 @@
 @model Jodit.ViewModels.ScheduleChangeModel
+@{
+    Layout = "_GroupNavigationLayout";
+    ViewData["IdGroup"] = Model.ScheduleChange.Group.IdGroup;
+    
+}
 
 <form asp-action="CreateScheduleChange" asp-controller="Group">
     
@@ -10,11 +15,11 @@
     
     <input type="hidden" asp-for="@Model.IdScheduleStatement" />
     
-     <h3>choose the day you want to change</h3>
+     <h3>Выберите день который хотите поменять</h3>
     @Html.DropDownList("chooseDate",new SelectList(Model.DateTimes))
     
     <div class="form-group">
-        <input type="submit" value="Create" class="btn btn-default">
+        <input type="submit" value="Подтвердить" class="btn btn-default">
     </div>
 </form>
 

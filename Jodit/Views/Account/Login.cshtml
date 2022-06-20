@@ -1,4 +1,205 @@
 @model Jodit.ViewModels.LoginModel
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap" rel="stylesheet">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700;500&display=swap" rel="stylesheet">
+    
+    
+<style>
+  body{
+      background-size: cover;
+      height: 100%;
+      width: 100%;
+      margin: 0;
+  }
+  
+  .conteiner{
+      width: 100%;
+      max-width: 1920px;
+  }
+  div.form{
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+  }
+   h1 {
+       margin: 30px 10px;
+       text-align: center;
+       color: #FFB100;    
+       font-size: 40px;
+       text-transform: uppercase;
+       font-family: 'Fira Sans', sans-serif;
+   }
+  
+  .form .signup {
+      margin: 0 0 0 40px;
+      text-align: center;
+      color: gray;
+      font-size: 20px;
+      font-family: sans-serif;
+      text-decoration: none;
+      
+  }
+  
+  .background-img {
+      width: 100%;  
+      height: 100vh;
+      background-image: url("img/img_authorization.jpg");
+      background-size: 300px;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      position:relative;
+      z-index: 0;
+  }
+  
+  .authorization-border {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 910px;
+      height: 100%;
+      background: #FFB100;
+      z-index: 999;  
+      
+      border-radius: 70% 0 0 70%; 
+  }
+  .authorization {
+      position: absolute;
+      top: 0px;
+      right: 0;
+      width: 900px;
+      height: 100%;
+      
+      background: #ffffff;
+      z-index: 999;
+      margin-left: 1600px;
+      border-radius: 70% 0 0 70%; 
+  }
+  
+  
+  .input-form{
+   margin: 15px 40px;
+   text-align: center;
+  }
+  .input-form input{
+      padding: 10px;
+      height: 60px;
+      width: 400px;
+      color: black;
+      font-size: 25px;
+      background: none;
+      outline: none;
+      border: 3px solid black;
+      border-radius: 8px;
+      box-sizing: border-box;
+  }
+  
+  .input-form input[type="text"]:focus, .input-form input[type="password"]:focus{
+      border: 3px solid #FFB100;
+      
+  }
+  
+  .input-form .enter{
+      margin-top: 15px;
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      border: none;
+      background: black;
+      font-weight: 700;
+      font-family: 'Mulish', sans-serif;
+  }
+  .input-form .registr{
+      color: #FFB100;
+      font-weight: 600;
+      text-transform: uppercase;
+      border: 3px solid #FFB100;
+      background: none;
+      font-weight: 500;
+      font-family: 'Mulish', sans-serif;
+  }
+  .input-form .enter:hover{
+      background: #FFB100;
+  }
+  .input-form .registr:hover{
+      color: black;
+      border: 3px solid black;
+  }
+  
+  
+  
+  .form .forget {
+      padding: 0 0 0 40px;
+      text-align: center;
+      color: gray;
+      font-size: 20px;
+      font-family: sans-serif;
+      text-decoration: none;
+  
+      font-weight: 400;
+      font-family: 'Mulish', sans-serif;
+      
+  }
+  .form a:hover{
+      color: #FFB100;
+  }
+  
+
+</style>
+</head>
+    
+<div class="background-img">
+    <div class="authorization-border">
+       <div class="authorization">
+            <div class="form">  
+                    <h1>Авторизация</h1>
+                <form asp-action="Login" asp-controller="Account" asp-anti-forgery="true">
+                    <!-- Email input -->
+                    <div class="input-form">
+                        <input asp-for="Email"  type="email" placeholder="Почта" />
+                        <span asp-validation-for="Email" />
+                    </div>
+                    
+                    <!-- Password input -->
+                    <div class="input-form">
+                        <input asp-for="Password" type="password" placeholder="Пароль" />
+                        <span asp-validation-for="Password" />
+                    </div>
+
+                    <div class="input-form">
+                        <input class="enter" type="submit" value="Войти">
+                    </div>
+                    
+                    <div class="input-form">
+                        <a class="registr" asp-action="Register" asp-controller="Account">Регистрация</a>
+                    </div> 
+                    
+                    
+                    
+                </form>
+                
+              
+            </div> 
+        </div>
+    </div>
+</div>
+</html>
+
+@*
 <section class="vh-100">
   <div class="container-fluid h-custom">
     <div class="row d-flex justify-content-center align-items-center h-100">
@@ -34,4 +235,4 @@
       </div>
     </div>
   </div>
-</section>
+</section>*@

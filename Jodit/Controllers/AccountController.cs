@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -11,7 +10,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Jodit.Controllers
 {
@@ -43,23 +41,28 @@ namespace Jodit.Controllers
                 
                if (findUser == null)
                {
-                   var hasher = new PasswordHasher<User>();
-                   User user = new User
+                   if (model.Password.Length > 7)
                    {
-                       FirstName = model.FirstName,
-                       SecondName = model.SecondName,
-                       LastName = model.LastName,
-                       Login = model.Login,
-                       Phone = model.Phone,
-                       Email = model.Email,
-                   };
-                   user.UserPassword = hasher.HashPassword(user, model.Password);
-                   await Authenticate(user.Email);
+                       var hasher = new PasswordHasher<User>();
+                       User user = new User
+                       {
+                           FirstName = model.FirstName,
+                           SecondName = model.SecondName,
+                           LastName = model.LastName,
+                           Login = model.Login,
+                           Phone = model.Phone,
+                           Email = model.Email,
+                       };
+                       user.UserPassword = hasher.HashPassword(user, model.Password);
+                       await Authenticate(user.Email);
                    
                    
-                   db.Users.Add(user);
-                   db.SaveChanges();
-                   return RedirectToAction("Account", "Account");
+                       db.Users.Add(user);
+                       db.SaveChanges();
+                       return RedirectToAction("Account", "Account");
+                   } 
+                   ModelState.AddModelError("", "Пароль должен содержать минимум 8 символов");
+
                }
            }
            return View(model);

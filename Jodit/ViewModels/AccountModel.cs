@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Jodit.Models;
 
 namespace Jodit.ViewModels

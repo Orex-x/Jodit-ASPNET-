@@ -1,5 +1,3 @@
-using System;
-
 namespace Jodit.Models
 {
     public class ErrorViewModel

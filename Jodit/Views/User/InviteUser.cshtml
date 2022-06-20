@@ -2,26 +2,31 @@
 
 @{
     ViewData["Title"] = "All groups";
+    Layout = "_GroupNavigationLayout";
+    ViewData["IdGroup"] = Model.Group.IdGroup;
 }
 
 
 <table class="table">
     <tr>
         <td>
-            Name
+            ФИО
         </td>
         <td>
-            Email
+            Почта
         </td>
         <td>
-            Phone
+            Телефон
+        </td>
+        <td>
+            Действия
         </td>
     </tr>
     @foreach(var user in Model.Users)
     {
         <tr>
             <td>
-                @user.FirstName @user.SecondName 
+                @user.FirstName @user.SecondName  @user.LastName
             </td>
             <td>
                 @user.Email
@@ -30,13 +35,14 @@
                 @user.Phone
             </td>
             <td>
-                @user.Phone
-            </td>
-            <td>
                 @{
                     if (Model.User.IdUser != user.IdUser)
                     {
-                        <a asp-action="InviteUserFinal" asp-controller="User" asp-route-idUser="@user.IdUser" asp-route-idGroup="@Model.Group.IdGroup">Invite</a>
+                        <div class="col">
+                            <a asp-action="InviteUserFinal" asp-controller="User" asp-route-idUser="@user.IdUser" asp-route-idGroup="@Model.Group.IdGroup">
+                                <button class="btn btn-dark my-2">Пригласить</button>
+                            </a>
+                        </div>
                     }
                 }
             </td>

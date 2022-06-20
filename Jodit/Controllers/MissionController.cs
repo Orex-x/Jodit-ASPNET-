@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Jodit.Models;
 using Jodit.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Jodit.Controllers
 {
+    [Authorize]
     public class MissionController : Controller
     {
         public enum STATUS
@@ -134,19 +136,22 @@ namespace Jodit.Controllers
               var a = db.UserMissions
                   .Include(c => c.Executor)
                   .Where(c => c.Mission.IdMission == id).ToList();
+
               
+
               List<User> executors = new List<User>();
               foreach (var userMission in a)
               {
                   executors.Add(userMission.Executor);
+                  
               }
               
               UserModel model = new UserModel()
               {
-                  Users = executors
+                  Users = executors,
               };
               
-              return View("../User/ListUsers", model);
+              return View("../Group/ListExicuters", model);
           }
           
           public IActionResult ListUserMissions(int id)
@@ -196,7 +201,9 @@ namespace Jodit.Controllers
           {
               var userName = User.Identity.Name;
               User user = db.Users.FirstOrDefault(i => i.Email == userName);
-              var userMission = db.UserMissions.FirstOrDefault(a => a.IdUserMission == idUserMission);
+              var userMission = db.UserMissions
+                  .Include(x => x.Mission)
+                  .FirstOrDefault(a => a.IdUserMission == idUserMission);
               
               var a = db.UserMissions
                   .Include(c => c.Executor)

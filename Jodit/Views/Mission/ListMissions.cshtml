@@ -2,28 +2,24 @@
 @model Jodit.ViewModels.MissionModel 
  
 
-<table class="table">
+<div class="row mt-4 ml-4">
+    <div class="col-12">
+        <h2 class="color1">Мои задачи</h2>
+    </div>
+</div>
+
+
+<table class="table table-sm">
+    <thead class="thead-dark">
     <tr>
-        <td>
-            Title
-        </td>
-        <td>
-            Description
-        </td>
-        <td>
-            Deadline
-        </td>
-        <td>
-            Action
-        </td>
-        <td>
-            Info
-        </td>
+        <th scope="col">Наименование</th>
+        <th scope="col">Описание</th>
+        <th scope="col">Дата сдачи</th>
+        <th scope="col">Действия</th>
+        <th scope="col">Подробная информация...</th>
     </tr>
-    
-    <tr>
-        <h2>Pending Missions</h2>
-    </tr>
+    </thead>
+    <tbody>
     @foreach(var userMission in Model.executorsMissions)
     {
         @if (userMission.Status.Equals(MissionController.STATUS.PENDING.ToString()))
@@ -39,20 +35,28 @@
                     @userMission.Mission.Deadline
                 </td>
                 <td>
-                    <a asp-action="TakeMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">take</a><br>
-                    <a asp-action="RefuseMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">refuse</a><br>
+                    <div class="row ml-4 my-3">
+                        <div class="col">
+                            <a asp-action="TakeMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">
+                                <button class="btn btn-dark my-2">Взять</button> 
+                            </a>
+                        </div>
+                        <div class="col">
+                            <a asp-action="RefuseMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">
+                                <button class="btn btn-dark my-2">Отклонить</button> 
+                            </a>
+                        </div>
+                        <div class="col">
+                            <a asp-action="ListExecutors" asp-route-id="@userMission.Mission.IdMission" asp-controller="Mission">
+                                <button class="btn btn-dark my-2">Список исполнителей</button> 
+                            </a>
+                        </div>
+                    </div>
                 </td>
-                <td>
-                    Author @userMission.Author.FirstName @userMission.Author.SecondName
-                    from the group @userMission.Group.GroupName
-                    <a asp-action="ListExecutors" asp-route-id="@userMission.Mission.IdMission" asp-controller="Mission">list executors</a><br>
-                </td>
-            </tr>
+            </tr>   
         }
     }
-    <tr>
-        <h2>Take Missions</h2>
-    </tr>
+    
     @foreach(var userMission in Model.executorsMissions)
     {
         @if (userMission.Status.Equals(MissionController.STATUS.TAKE.ToString()))
@@ -68,42 +72,72 @@
                     @userMission.Mission.Deadline
                 </td>
                 <td>
-                    <a asp-action="PassMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">Pass</a><br>
+                    <div class="row ml-4 my-3">
+                        <div class="col">
+                            <a asp-action="PassMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">
+                                <button class="btn btn-dark my-2">Вернуть</button> 
+                            </a>
+                        </div>
+                    </div>
                 </td>
                 <td>
-                    Author @userMission.Author.FirstName @userMission.Author.SecondName
-                    from the group @userMission.Group.GroupName
-                    <a asp-action="ListExecutors" asp-route-id="@userMission.Mission.IdMission" asp-controller="Mission">list executors</a><br>
+                    <div class="row ml-4 my-3">
+                        <div class="col">
+                            <a asp-action="ListExecutors" asp-route-id="@userMission.Mission.IdMission" asp-controller="Mission">
+                                <button class="btn btn-dark my-2">Список исполнителей</button> 
+                            </a>
+                        </div>
+                    </div>
                 </td>
             </tr>
         }
     }
-    <tr>
-        <h2>Authors Missions</h2>
-    </tr>
-     @foreach (var userMission in Model.authorsMissions)
-     {
-         <tr>
-             <td>
-                 @userMission.Mission.Title
-             </td>
-             <td>
-                 @userMission.Mission.Description
-             </td>
-             <td>
-                 @userMission.Mission.Deadline
-             </td>
-             <td>
-                 @if (userMission.Status.Equals(MissionController.STATUS.PASS.ToString()))
-                 {
-                     <a asp-action="deleteMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">accept</a><br>
-                     <a asp-action="returnMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">return</a><br>
-                 }
-                 <a asp-action="deleteMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">delete</a><br>
-             </td>
-             <td>
-                 <a asp-action="ListUserMissions" asp-route-id="@userMission.Mission.IdMission" asp-controller="Mission">list executors</a><br>
-             </td>
-         </tr>
-     }
+    
+    @foreach (var userMission in Model.authorsMissions)
+    {
+        <tr>
+            <td>
+                @userMission.Mission.Title
+            </td>
+            <td>
+                @userMission.Mission.Description
+            </td>
+            <td>
+                @userMission.Mission.Deadline
+            </td>
+            <td>
+             <div class="row ml-4 my-3">
+                @if (userMission.Status.Equals(MissionController.STATUS.PASS.ToString()))
+                {
+                    <div class="col">
+                        <a asp-action="deleteMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">
+                            <button class="btn btn-dark my-2">Принять</button> 
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a asp-action="returnMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">
+                            <button class="btn btn-dark my-2">Вернуть</button> 
+                        </a>
+                    </div>
+                   
+                }
+                <div class="col">
+                    <a asp-action="deleteMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">
+                        <button class="btn btn-dark my-2">Удалить</button> 
+                    </a>
+                </div>
+             </div>
+            </td>
+            <td>
+                <div class="row ml-4 my-3">
+                    <div class="col">
+                        <a asp-action="ListUserMissions" asp-route-id="@userMission.Mission.IdMission" asp-controller="Mission">
+                            <button class="btn btn-dark my-2">Список исполнителей</button> 
+                        </a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    }
+    </tbody>
 </table>

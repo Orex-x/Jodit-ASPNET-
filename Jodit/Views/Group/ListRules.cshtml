@@ -1,17 +1,56 @@
-@model List<Rule>
+@model Jodit.ViewModels.ListRuleViewMode
 
 @{
-    Layout = null;
+    Layout = "_GroupNavigationLayout";
+    ViewData["IdGroup"] = Model.idGroup;
 }
 
 @{
-    foreach (var item in Model)
+    foreach (var item in Model.list)
     {
-        <h2>User: @item.User.FirstName</h2>
-        <h3>on duty only</h3>
+        <h2>Пользователь: @item.User.FirstName</h2>
+        <h3>Дежурит только в следующие дни: </h3>
         foreach (var itemDay in item.Days)
         {
-            <h3>@itemDay</h3>
+            switch (itemDay)
+            {
+                case 0:
+                {
+                    <h3>Восресенье</h3>
+                    break;
+                }
+                case 1:
+                {
+                    <h3>Понедельник</h3>
+                    break;
+                }
+                case 2:
+                {
+                    <h3>Вторник</h3>
+                    break;
+                }
+                case 3:
+                {
+                    <h3>Среда</h3>
+                    break;
+                }
+                case 4:
+                {
+                    <h3>Четверг</h3>
+                    break;
+                }
+                case 5:
+                {
+                    <h3>Пятница</h3>
+                    break;
+                }
+                case 6:
+                {
+                    <h3>Суббота</h3>
+                    break;
+                }
+                    
+            }
         }
     }
 }

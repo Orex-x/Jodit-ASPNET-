@@ -1,35 +1,26 @@
-@using System.Collections
 @model Jodit.ViewModels.GroupDetailsModel
 
 @{
     ViewData["Title"] = "Details";
+    ViewData["IdGroup"] = Model.UserGroup.Group.IdGroup;
+    Layout = "_GroupNavigationLayout";
+    
 }
+
 <h1>@Model.UserGroup.Group.GroupName</h1><br>
-
-
-<a asp-action="ListUsers" asp-route-id="@Model.UserGroup.Group.IdGroup" asp-controller="User">Users list</a><br>
-<a asp-action="ListRules" asp-controller="Group" asp-route-idGroup="@Model.UserGroup.Group.IdGroup">Rules list</a><br>
-<a asp-action="CreateStatement" asp-route-id="@Model.UserGroup.Group.IdGroup" asp-controller="Group">will change</a><br>
-<a asp-action="ListScheduleStatement" asp-route-id="@Model.UserGroup.Group.IdGroup" asp-controller="Group">list change</a><br>
-
-<br>
-@{
-    if (Model.UserGroup.IsAdmin)
-    {
-        <a asp-action="CreateMission" asp-route-id="@Model.UserGroup.Group.IdGroup" asp-controller="Mission">Create task</a><br>
-        <a asp-action="CreateRule" asp-controller="Group" asp-route-id="@Model.UserGroup.Group.IdGroup">Create rule</a><br>
-        <a asp-action="InviteUser" asp-controller="User" asp-route-id="@Model.UserGroup.Group.IdGroup">Invite user</a><br>
-    }
-}
-
 <form>
     <div>
-        <label for="date">Enter date:</label>
+        <label for="date">Выберете дату:</label>
         <input type="date" id="date" name="date">
     </div>
-    <div>
-        <input type="submit">
+    <div class="row">
+        <div class="col">
+            <a>
+                <button class="btn btn-dark my-2" type="submit">Подтвердить</button>
+            </a>
+        </div>
     </div>
+    
 </form>
 <br>
 <h6>@ViewData["ResultCalculateByDate"]</h6>
@@ -41,9 +32,9 @@
     foreach (var item in list)
     {
         <h6>
-            Date: @item.DateTime.ToShortDateString()
-            user: @item.User.FirstName @item.User.SecondName
-            day of the week: @item.DateTime.DayOfWeek
+            Дата: @item.DateTime.ToShortDateString()
+            Пользователь: @item.User.FirstName @item.User.SecondName
+            День недели: @item.DateTime.DayOfWeek
         </h6>
     }
 }

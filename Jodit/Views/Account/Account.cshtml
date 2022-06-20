@@ -1,27 +1,13 @@
 @model Jodit.ViewModels.AccountModel
- 
-
 @{
     ViewData["Title"] = "Account";
 }
 
-<h2>@Model.user.FirstName @Model.user.SecondName @Model.user.LastName </h2>
-<a asp-action="createGroup" asp-controller="Group">Add group</a><br>
-<a asp-action="GroupInvitations" asp-controller="Account">My invitations</a><br>
-<a asp-action="ListMissions" asp-controller="Mission">My missions</a>
-<a asp-action="TelegramBot" asp-controller="Home">Telegram bot</a><br>
-
-
-   
-@foreach(var item in Model.user.UserGroups)
-{
-        
-    <div>
-        <a asp-action="Details" asp-controller="Group" asp-route-id="@item.Group.IdGroup"><h5>@item.Group.GroupName</h5></a>
-    </div>
-}
-
-
+<h2>@Model.user.FirstName</h2>
+<h2>@Model.user.SecondName</h2>
+<h2>@Model.user.LastName</h2>
+<h2>@Model.user.Email</h2>
+<h2>@Model.user.Phone</h2>
 
 <form asp-action="Logout" asp-controller="Account" asp-anti-forgery="true">
     <div>

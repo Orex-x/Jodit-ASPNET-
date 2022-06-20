@@ -5,19 +5,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using Jodit.Models;
 using Jodit.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace Jodit.Controllers
 {
+    [Authorize]
     public class GroupController : Controller
     {
         private ApplicationContext db;
+
+     
         public GroupController(ApplicationContext context)
         {
             db = context;
         }
+        
         
         public IActionResult ListGroups()
         {
@@ -36,6 +41,7 @@ namespace Jodit.Controllers
             
         }
 
+        
         public IActionResult CreateGroup() => View();
 
         public IActionResult ListRules(int idGroup)
@@ -45,7 +51,11 @@ namespace Jodit.Controllers
                 .ThenInclude(x => x.User)
                 .FirstOrDefault(x => x.IdGroup == idGroup);
 
-            return View(group.Rules);
+            return View(new ListRuleViewMode()
+            {
+                list = group.Rules,
+                idGroup = ApplicationContext.idCurrentGroup
+            });
 
         }
 
@@ -62,13 +72,13 @@ namespace Jodit.Controllers
             {
                 daysOfTheWeek = new Dictionary<string, bool>()
                 {
-                    {"Sunday", false},
-                    {"Mondey", false},
-                    {"Tuesday", false},
-                    {"Wednesday", false},
-                    {"Thursday", false},
-                    {"Friday", false},
-                    {"Saturday", false},
+                    {"Воскресенье", false},
+                    {"Понедельник", false},
+                    {"Вторник", false},
+                    {"Среда", false},
+                    {"Четверг", false},
+                    {"Пятница", false},
+                    {"Суббота", false},
                 },
                 IdGroup = id
             };
@@ -83,13 +93,13 @@ namespace Jodit.Controllers
             {
                 Dictionary<string, int> dic = new Dictionary<string, int>() {
 
-                    {"Sunday", 0},
-                    {"Mondey", 1},
-                    {"Tuesday", 2},
-                    {"Wednesday", 3},
-                    {"Thursday", 4},
-                    {"Friday", 5},
-                    {"Saturday", 6},
+                    {"Воскресенье", 0},
+                    {"Понедельник", 1},
+                    {"Вторник", 2},
+                    {"Среда", 3},
+                    {"Четверг", 4},
+                    {"Пятница", 5},
+                    {"Суббота", 6},
                 };
 
                 
@@ -131,16 +141,18 @@ namespace Jodit.Controllers
              group.DateOfCreation = DateTime.Today;
              var userName = User.Identity.Name;
              User user = db.Users.FirstOrDefault(i => i.Email == userName);
-             
-             
-             db.Groups.Add(group);
-             if (user != null)
-             {
-                 user.UserGroups.Add(new UserGroup {Group = group, IsAdmin = true, User = user});
-             }
 
-             await db.SaveChangesAsync();
-              return RedirectToAction("ListGroups", "Group");
+             if (group.GroupName.Length > 0)
+             {
+                 db.Groups.Add(group);
+                 if (user != null)
+                 {
+                     user.UserGroups.Add(new UserGroup {Group = group, IsAdmin = true, User = user});
+                 }
+
+                 await db.SaveChangesAsync();
+             }
+             return RedirectToAction("ListGroups", "Group");
          }
 
 
@@ -284,14 +296,19 @@ namespace Jodit.Controllers
                  .Where(c => c.Group.IdGroup == id)
                  .ToList();
              
-             return View(list);
+             return View(new ListScheduleStatementViewModel()
+             {
+                 list = list,
+                 groupId = ApplicationContext.idCurrentGroup
+             });
          }
          
 
-         public async Task<IActionResult> Details(int? id, DateTime date)
+         public async Task<IActionResult> Details(int id, DateTime date)
          {
              if (id != null)
              {
+                 
                  var userName = User.Identity.Name;
                  User user = db.Users.FirstOrDefault(i => i.Email == userName);
                  Group group = await db.Groups
@@ -308,16 +325,21 @@ namespace Jodit.Controllers
                      .ThenInclude(x => x.User)
                      .FirstOrDefaultAsync(i => i.User.IdUser == user.IdUser);
                  
+                
+                 
                  if (userGroup != null)
                  {
+                     ApplicationContext.idCurrentGroup = id;
+                     ApplicationContext.isAdmin = userGroup.IsAdmin;
+                     
                      if (date.Date != DateTime.MinValue)
                      {
                         UserDateTime ud = group.CalculateByDate(date.Date); 
-                        string str =  "Date: " + ud.DateTime.ToShortDateString() + " user: " + 
+                        string str =  "Дата: " + ud.DateTime.ToShortDateString() + " Пользователь: " + 
                                       ud.User.FirstName + " " + ud.User.SecondName; 
                         ViewData["ResultCalculateByDate"] = str;
                      }
-                     
+
                      GroupDetailsModel model = new GroupDetailsModel()
                      {
                          UserGroup = userGroup,
@@ -394,15 +416,20 @@ namespace Jodit.Controllers
 
                  if (group != null)
                  {
+                     try
+                     {
+                         db.Entry(group)
+                             .Collection(c => c.Users)
+                             .Load();
                      
-                     db.Entry(group)
-                         .Collection(c => c.Users)
-                         .Load();
-                     
-                     
-                     db.Groups.Remove(group);
-                     await db.SaveChangesAsync();
-                     return RedirectToAction("ListGroups");
+                         db.Groups.Remove(group);
+                         await db.SaveChangesAsync();
+                         return RedirectToAction("ListGroups");
+                     }
+                     catch (Exception e)
+                     {
+                         
+                     }
                  }
              }
              return NotFound();
