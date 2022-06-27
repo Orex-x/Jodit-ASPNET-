@@ -11,15 +11,15 @@ namespace Jodit.Controllers
     [Authorize]
     public class UserController : Controller
     {
-        private ApplicationContext db;
+        private ApplicationContext _db;
         public UserController(ApplicationContext context)
         {
-            db = context;
+            _db = context;
         }
 
          public IActionResult ListUsers(int id)
          {
-             Group group = db.Groups
+             Group group = _db.Groups
                  .Include(x => x.Users)
                  .FirstOrDefault(i => i.IdGroup == id);
              
@@ -34,15 +34,15 @@ namespace Jodit.Controllers
          
 
          
-         [HttpGet]
+
          public IActionResult InviteUser(int id)
          {
              var userName = User.Identity.Name;
-             User user = db.Users.FirstOrDefault(i => i.Email == userName);
-             Group group = db.Groups.FirstOrDefault(i => i.IdGroup == id);
+             User user = _db.Users.FirstOrDefault(i => i.Email == userName);
+             Group group = _db.Groups.FirstOrDefault(i => i.IdGroup == ApplicationContext.IdCurrentGroup);
              UserModel model = new UserModel
              {
-                 Users = db.Users,
+                 Users = _db.Users,
                  Group = group,
                  User = user
              };
@@ -53,11 +53,11 @@ namespace Jodit.Controllers
          [ActionName("InviteUserFinal")]
          public async Task<IActionResult> InviteUser(int idUser, int idGroup)
          {
-             User invitingUser = db.Users.FirstOrDefault(i => i.Email == User.Identity.Name); 
-             User invitedUser = db.Users.FirstOrDefault(i => i.IdUser == idUser);   
-             Group group = db.Groups.FirstOrDefault(i => i.IdGroup == idGroup);
+             User invitingUser = _db.Users.FirstOrDefault(i => i.Email == User.Identity.Name); 
+             User invitedUser = _db.Users.FirstOrDefault(i => i.IdUser == idUser);   
+             Group group = _db.Groups.FirstOrDefault(i => i.IdGroup == idGroup);
              
-             var groupInvite = db.GroupInvites
+             var groupInvite = _db.GroupInvites
                  .Where(us => us.InvitedUser.IdUser == invitedUser.IdUser)
                  .Where(us => us.InvitingUser.IdUser == invitingUser.IdUser)
                  .FirstOrDefault(gr => gr.Group.IdGroup == group.IdGroup);
@@ -70,9 +70,10 @@ namespace Jodit.Controllers
                      InvitingUser = invitingUser, 
                      Title = "Вступай в группу"
                  });
-                 await db.SaveChangesAsync();
+                 await _db.SaveChangesAsync();
              }
-             return RedirectToAction("ListGroups", "Group");
+
+             return RedirectToAction("InviteUser", idGroup);
          }
     }
 }

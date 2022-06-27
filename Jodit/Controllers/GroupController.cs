@@ -15,20 +15,20 @@ namespace Jodit.Controllers
     [Authorize]
     public class GroupController : Controller
     {
-        private ApplicationContext db;
+        private ApplicationContext _db;
 
      
         public GroupController(ApplicationContext context)
         {
-            db = context;
+            _db = context;
         }
         
         
         public IActionResult ListGroups()
         {
             var userName = User.Identity.Name;
-                User user = db.Users.FirstOrDefault(i => i.Email == userName);
-                var userGroups = db.UserGroups
+                User user = _db.Users.FirstOrDefault(i => i.Email == userName);
+                var userGroups = _db.UserGroups
                     .Include(g => g.Group)
                     .Where(i => i.User.IdUser == user.IdUser).ToList();
                 
@@ -46,31 +46,44 @@ namespace Jodit.Controllers
 
         public IActionResult ListRules(int idGroup)
         {
-            var group = db.Groups
+            var group = _db.Groups
                 .Include(x => x.Rules)
                 .ThenInclude(x => x.User)
                 .FirstOrDefault(x => x.IdGroup == idGroup);
 
             return View(new ListRuleViewMode()
             {
-                list = group.Rules,
-                idGroup = ApplicationContext.idCurrentGroup
+                List = group.Rules,
+                IdGroup = ApplicationContext.IdCurrentGroup
             });
 
         }
 
         public IActionResult CreateRule(int id)
         {
-            var group = db.Groups
+            var group = _db.Groups
                 .Include(x => x.Users)
                 .FirstOrDefault(x => x.IdGroup == id);
             
-            SelectList users = new SelectList(group.Users, "IdUser", "FirstName");
-            ViewBag.Users = users;
+            var userName = User.Identity.Name;
+            var user = _db.Users.FirstOrDefault(i => i.Email == userName);
+            var user_group = _db.UserGroups
+                .Include(x => x.User)
+                .FirstOrDefault(x => x.User.IdUser == user.IdUser);
+
+            var list_users = group.Users;
+            
+            if (user_group.IsAdmin)
+            {
+                list_users.Remove(user);
+            }
+            
+            SelectList select_list_users = new SelectList(list_users, "IdUser", "FirstName");
+            ViewBag.Users = select_list_users;
 
             RuleViewModel model = new RuleViewModel()
             {
-                daysOfTheWeek = new Dictionary<string, bool>()
+                DaysOfTheWeek = new Dictionary<string, bool>()
                 {
                     {"Воскресенье", false},
                     {"Понедельник", false},
@@ -88,9 +101,9 @@ namespace Jodit.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateRule(RuleViewModel model)
         {
-
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && model.IdUser != 0)
             {
+                
                 Dictionary<string, int> dic = new Dictionary<string, int>() {
 
                     {"Воскресенье", 0},
@@ -104,7 +117,7 @@ namespace Jodit.Controllers
 
                 
                 bool update = true;
-                var group = await db.Groups
+                var group = await _db.Groups
                     .Include(x => x.Rules)
                     .ThenInclude(x => x.User)
                     .FirstOrDefaultAsync(x => x.IdGroup == model.IdGroup);
@@ -118,7 +131,7 @@ namespace Jodit.Controllers
                 }
                 
                 rule.Days.Clear();
-                foreach (var item in model.daysOfTheWeek)
+                foreach (var item in model.DaysOfTheWeek)
                 {
                     if(item.Value)
                         rule.Days.Add(dic[item.Key]);
@@ -126,12 +139,12 @@ namespace Jodit.Controllers
                 
                 if (!update)
                 {
-                    rule.User = await db.Users.FirstOrDefaultAsync(x => x.IdUser == model.IdUser);
+                    rule.User = await _db.Users.FirstOrDefaultAsync(x => x.IdUser == model.IdUser);
                     group.Rules.Add(rule);
                 }
-                await db.SaveChangesAsync();
+                await _db.SaveChangesAsync();
             }
-            return RedirectToAction("ListGroups", "Group");
+            return RedirectToAction("CreateRule", "Group", ApplicationContext.IdCurrentGroup);
         }
         
         
@@ -140,17 +153,17 @@ namespace Jodit.Controllers
          {
              group.DateOfCreation = DateTime.Today;
              var userName = User.Identity.Name;
-             User user = db.Users.FirstOrDefault(i => i.Email == userName);
+             User user = _db.Users.FirstOrDefault(i => i.Email == userName);
 
              if (group.GroupName.Length > 0)
              {
-                 db.Groups.Add(group);
+                 _db.Groups.Add(group);
                  if (user != null)
                  {
                      user.UserGroups.Add(new UserGroup {Group = group, IsAdmin = true, User = user});
                  }
 
-                 await db.SaveChangesAsync();
+                 await _db.SaveChangesAsync();
              }
              return RedirectToAction("ListGroups", "Group");
          }
@@ -159,15 +172,14 @@ namespace Jodit.Controllers
         public IActionResult CreateStatement(int id)
         {
             var userName = User.Identity.Name;
-            User user = db.Users.FirstOrDefault(i => i.Email == userName);
-            Group group = db.Groups
+            User user = _db.Users.FirstOrDefault(i => i.Email == userName);
+            Group group = _db.Groups
                 .Include(x => x.Users)
                 .Include(x => x.UserGroups)
                 .ThenInclude(x => x.User)
                 .FirstOrDefault(gr => gr.IdGroup == id);
            
 
-            //  Dictionary<DateTime, User> dictionary = group.CalculateToDate(DateTime.Now.Date.AddDays(30));
             List<UserDateTime> list = group.CreateSchedule(DateTime.Now.Date.AddDays(30));
             var listBuf = new ArrayList();
             foreach (UserDateTime item in list)
@@ -198,9 +210,9 @@ namespace Jodit.Controllers
          {
              if (ModelState.IsValid)
              {
-                 var user = await db.Users.FirstOrDefaultAsync
+                 var user = await _db.Users.FirstOrDefaultAsync
                      (i => i.IdUser == model.ScheduleStatement.BeforeUser.IdUser);
-                 var group = await db.Groups
+                 var group = await _db.Groups
                      .FirstOrDefaultAsync(gr => gr.IdGroup == 
                                                 model.ScheduleStatement.Group.IdGroup);
                  var selectedValue = Request.Form["chooseDate"];
@@ -209,7 +221,7 @@ namespace Jodit.Controllers
                  model.ScheduleStatement.BeforeUser = user;
                  model.ScheduleStatement.Group = group;
                  group.ScheduleStatements.Add(model.ScheduleStatement);
-                 await db.SaveChangesAsync();
+                 await _db.SaveChangesAsync();
              }
              return RedirectToAction("ListGroups", "Group");
          }
@@ -217,9 +229,9 @@ namespace Jodit.Controllers
         public IActionResult CreateScheduleChange(int idGroup, int idUserBefore, int idScheduleStatement)
         {
             var userName = User.Identity.Name;
-            User user = db.Users.FirstOrDefault(i => i.Email == userName);
-            User userBefore = db.Users.FirstOrDefault(i => i.IdUser == idUserBefore);
-            Group group = db.Groups
+            User user = _db.Users.FirstOrDefault(i => i.Email == userName);
+            User userBefore = _db.Users.FirstOrDefault(i => i.IdUser == idUserBefore);
+            Group group = _db.Groups
                 .Include(x => x.Users)
                 .Include(x => x.UserGroups)
                 .ThenInclude(x => x.User)
@@ -257,15 +269,15 @@ namespace Jodit.Controllers
          {
              if (ModelState.IsValid)
              {
-                 var userAfter = db.Users
+                 var userAfter = _db.Users
                      .FirstOrDefault(i => i.IdUser == model.ScheduleChange.AfterUser.IdUser);
-                 var userBefore = db.Users
+                 var userBefore = _db.Users
                      .FirstOrDefault(i => i.IdUser == model.ScheduleChange.BeforeUser.IdUser);
 
-                 var statement = db.ScheduleStatements
+                 var statement = _db.ScheduleStatements
                      .FirstOrDefault(i => i.IdScheduleStatement == model.IdScheduleStatement);
                  
-                 var group = await db.Groups.FirstOrDefaultAsync(gr => gr.IdGroup == model.ScheduleChange.Group.IdGroup);
+                 var group = await _db.Groups.FirstOrDefaultAsync(gr => gr.IdGroup == model.ScheduleChange.Group.IdGroup);
                  
                  var selectedValue = Request.Form["chooseDate"];
                  var parsedDate = DateTime.Parse(selectedValue);
@@ -278,8 +290,8 @@ namespace Jodit.Controllers
                  
                  
                  group.ScheduleChanges.Add(model.ScheduleChange);
-                 db.ScheduleStatements.Remove(statement);
-                 await db.SaveChangesAsync();
+                 _db.ScheduleStatements.Remove(statement);
+                 await _db.SaveChangesAsync();
              }
              return RedirectToAction("ListGroups", "Group");
          }
@@ -287,9 +299,9 @@ namespace Jodit.Controllers
          public IActionResult ListScheduleStatement(int id)
          {
              var userName = User.Identity.Name;
-             User user = db.Users.FirstOrDefault(i => i.Email == userName);
+             User user = _db.Users.FirstOrDefault(i => i.Email == userName);
              
-             var list = db.ScheduleStatements
+             var list = _db.ScheduleStatements
                  .Include(u => u.BeforeUser)
                  .Include(u => u.Group)// подгружаем данные по группам
                  .Where(c => c.BeforeUser.IdUser != user.IdUser)
@@ -298,8 +310,8 @@ namespace Jodit.Controllers
              
              return View(new ListScheduleStatementViewModel()
              {
-                 list = list,
-                 groupId = ApplicationContext.idCurrentGroup
+                 List = list,
+                 GroupId = ApplicationContext.IdCurrentGroup
              });
          }
          
@@ -310,15 +322,15 @@ namespace Jodit.Controllers
              {
                  
                  var userName = User.Identity.Name;
-                 User user = db.Users.FirstOrDefault(i => i.Email == userName);
-                 Group group = await db.Groups
+                 User user = _db.Users.FirstOrDefault(i => i.Email == userName);
+                 Group group = await _db.Groups
                      .Include(x => x.Users)
                      .Include(x => x.UserGroups)
                      .ThenInclude(x => x.User)
                      .Include(x => x.ScheduleChanges)
                      .FirstOrDefaultAsync(gr => gr.IdGroup == id);
 
-                 var userGroup = await db.UserGroups
+                 var userGroup = await _db.UserGroups
                      .Where(i => i.Group.IdGroup == id)
                      .Include(x => x.Group)
                      .ThenInclude(x => x.Rules)
@@ -329,15 +341,21 @@ namespace Jodit.Controllers
                  
                  if (userGroup != null)
                  {
-                     ApplicationContext.idCurrentGroup = id;
-                     ApplicationContext.isAdmin = userGroup.IsAdmin;
-                     
-                     if (date.Date != DateTime.MinValue)
+                     ApplicationContext.IdCurrentGroup = id;
+                     ApplicationContext.IsAdmin = userGroup.IsAdmin;
+                     try
                      {
-                        UserDateTime ud = group.CalculateByDate(date.Date); 
-                        string str =  "Дата: " + ud.DateTime.ToShortDateString() + " Пользователь: " + 
-                                      ud.User.FirstName + " " + ud.User.SecondName; 
-                        ViewData["ResultCalculateByDate"] = str;
+                         if (date.Date != DateTime.MinValue)
+                         {
+                             UserDateTime ud = group.CalculateByDate(date.Date); 
+                             string str =  "Дата: " + ud.DateTime.ToShortDateString() + " Пользователь: " + 
+                                           ud.User.FirstName + " " + ud.User.SecondName; 
+                             ViewData["ResultCalculateByDate"] = str;
+                         }
+                     }
+                     catch (Exception e)
+                     {
+                         
                      }
 
                      GroupDetailsModel model = new GroupDetailsModel()
@@ -357,15 +375,15 @@ namespace Jodit.Controllers
          {
              if (idUserGroup != null)
              {
-                 var userGroup = await db.UserGroups
+                 var userGroup = await _db.UserGroups
                      .Include(x => x.Group)
                      .Include(x => x.User)
                      .FirstOrDefaultAsync(i => i.IdUserGroup == idUserGroup);
 
                  if (userGroup != null)
                  {
-                     db.UserGroups.Remove(userGroup);
-                     await db.SaveChangesAsync();
+                     _db.UserGroups.Remove(userGroup);
+                     await _db.SaveChangesAsync();
                      return RedirectToAction("ListGroups", "Group");
                  }
              }
@@ -377,7 +395,7 @@ namespace Jodit.Controllers
          {
              if (id != null)
              {
-                 var group = await db.Groups.FirstOrDefaultAsync(gr => gr.IdGroup == id);
+                 var group = await _db.Groups.FirstOrDefaultAsync(gr => gr.IdGroup == id);
                  if (group != null)
                  {
                      return View(group);
@@ -389,8 +407,8 @@ namespace Jodit.Controllers
          [HttpPost]
          public async Task<IActionResult> Edit(Group group)
          {
-             db.Groups.Update(group);
-             await db.SaveChangesAsync();
+             _db.Groups.Update(group);
+             await _db.SaveChangesAsync();
              return RedirectToAction("ListGroups");
          }
          
@@ -400,7 +418,7 @@ namespace Jodit.Controllers
          {
              if (id != null)
              {
-                 var group = await db.Groups.FirstOrDefaultAsync(gr => gr.IdGroup == id);
+                 var group = await _db.Groups.FirstOrDefaultAsync(gr => gr.IdGroup == id);
                  if (group != null)
                      return View(group);
              }
@@ -412,18 +430,18 @@ namespace Jodit.Controllers
          {
              if (id != null)
              {
-                 var group = await db.Groups.FirstOrDefaultAsync(gr => gr.IdGroup == id);
+                 var group = await _db.Groups.FirstOrDefaultAsync(gr => gr.IdGroup == id);
 
                  if (group != null)
                  {
                      try
                      {
-                         db.Entry(group)
+                         _db.Entry(group)
                              .Collection(c => c.Users)
                              .Load();
                      
-                         db.Groups.Remove(group);
-                         await db.SaveChangesAsync();
+                         _db.Groups.Remove(group);
+                         await _db.SaveChangesAsync();
                          return RedirectToAction("ListGroups");
                      }
                      catch (Exception e)

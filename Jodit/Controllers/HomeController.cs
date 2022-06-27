@@ -9,10 +9,10 @@ namespace Jodit.Controllers
 {
     public class HomeController : Controller
     {
-        private ApplicationContext db;
+        private ApplicationContext _db;
         public HomeController(ApplicationContext context)
         {
-            db = context;
+            _db = context;
         }
 
         public IActionResult Index()
@@ -28,30 +28,30 @@ namespace Jodit.Controllers
         public IActionResult TelegramBot()
         {
              var userName = User.Identity.Name;
-             var user = db.Users.FirstOrDefault(i => i.Email == userName);
+             var user = _db.Users.FirstOrDefault(i => i.Email == userName);
              
-             var UserChat = db.UserChatIds
+             var userChat = _db.UserChatIds
                  .Include(x => x.User)
                  .FirstOrDefault(i => i.User.IdUser == user.IdUser);
              
              string key = KeyGenerator.GetRandomString();
             
              
-             if (UserChat == null)
+             if (userChat == null)
              {
-                 UserChatID userChatId = new UserChatID()
+                 UserChatId userChatId = new UserChatId()
                  {
                      Key = key,
                      User = user
                  };
-                 db.UserChatIds.Add(userChatId);
-                 db.SaveChanges();
+                 _db.UserChatIds.Add(userChatId);
+                 _db.SaveChanges();
              }
              else
              {
-                 UserChat.Key = key;
-                 db.UserChatIds.Update(UserChat);
-                 db.SaveChanges();
+                 userChat.Key = key;
+                 _db.UserChatIds.Update(userChat);
+                 _db.SaveChanges();
              }
 
 

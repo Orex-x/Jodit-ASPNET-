@@ -1,7 +1,7 @@
 @model Jodit.ViewModels.ListScheduleStatementViewModel
 @{
     Layout = "_GroupNavigationLayout"; 
-    ViewData["IdGroup"] = Model.groupId;
+    ViewData["IdGroup"] = Model.GroupId;
 }
 
 <table class="table table-sm">
@@ -13,7 +13,7 @@
     </tr>
     </thead>
     <tbody>
-    @foreach(var statement in Model.list)
+    @foreach(var statement in Model.List)
     {
         <tr>
             <td>
@@ -29,9 +29,8 @@
                            asp-route-idUserBefore="@statement.BeforeUser.IdUser"
                            asp-route-idScheduleStatement="@statement.IdScheduleStatement"
                            asp-controller="Group">
-                             <button class="btn btn-dark my-2">Принять</button>
+                            <button class="btn btn-dark my-2">Принять</button>
                         </a>
-                        
                     </div>
                 </div>
             </td>

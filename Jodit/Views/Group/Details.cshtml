@@ -29,12 +29,27 @@
 
 @{
     List<UserDateTime> list = Model.UserGroup.Group.CreateSchedule(DateTime.Now.Date.AddDays(30));
-    foreach (var item in list)
+    
+    if (list.Count > 0)
     {
-        <h6>
-            Дата: @item.DateTime.ToShortDateString()
-            Пользователь: @item.User.FirstName @item.User.SecondName
-            День недели: @item.DateTime.DayOfWeek
-        </h6>
+        foreach (var item in list)
+        {
+            <h6>
+                Дата: @item.DateTime.ToShortDateString()
+                Пользователь: @item.User.FirstName @item.User.SecondName
+                День недели: @item.DateTime.DayOfWeek
+            </h6>
+        }
+    }
+    else
+    {
+        <br/>
+        <h5>Пригласите пользователя в группу</h5>
+        <a asp-action="InviteUser" asp-controller="User" asp-route-id="@ViewData["IdGroup"]">
+            <button class="btn btn-dark mt-4">
+                Пригласить пользователя
+            </button>
+        </a>
+
     }
 }

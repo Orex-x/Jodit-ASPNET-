@@ -14,29 +14,29 @@ namespace Jodit.Controllers
     [Authorize]
     public class MissionController : Controller
     {
-        public enum STATUS
+        public enum Status
         {
-            PENDING,
-            REFUSE,
-            TAKE,
-            PASS
+            Pending,
+            Refuse,
+            Take,
+            Pass
             
         }
         
-        private ApplicationContext db;
+        private ApplicationContext _db;
           public MissionController(ApplicationContext context)
           {
-              db = context;
+              _db = context;
           }
           
           
           public IActionResult CreateMission(int id)
           {
               var userName = User.Identity.Name;
-              User mainUser = db.Users.FirstOrDefault(i => i.Email == userName);
-              Group group = db.Groups.FirstOrDefault(i => i.IdGroup == id);
+              User mainUser = _db.Users.FirstOrDefault(i => i.Email == userName);
+              Group group = _db.Groups.FirstOrDefault(i => i.IdGroup == id);
              
-              db.Entry(group)
+              _db.Entry(group)
                   .Collection(c => c.Users)
                   .Load();
               
@@ -63,44 +63,50 @@ namespace Jodit.Controllers
           {
               if (ModelState.IsValid)
               {
-                  var userName = User.Identity.Name;
-                  User author = db.Users.FirstOrDefault(i => i.Email == userName);
-                  model.Mission.DateOfCreation = DateTime.Now.Date;
-                  Group group = db.Groups.FirstOrDefault(i => i.IdGroup == model.Group.IdGroup);
-
-                  if (author != null)
+                  try
                   {
-                      db.Missions.Add(model.Mission);
-                      foreach (var chooseUser in model.ChooseUsers)
+                      var userName = User.Identity.Name;
+                      User author = _db.Users.FirstOrDefault(i => i.Email == userName);
+                      model.Mission.DateOfCreation = DateTime.Now.Date;
+                      Group group = _db.Groups.FirstOrDefault(i => i.IdGroup == model.Group.IdGroup);
+
+                      if (author != null)
                       {
-                          if (chooseUser.Checkbox.Value)
+                          _db.Missions.Add(model.Mission);
+                          foreach (var chooseUser in model.ChooseUsers)
                           {
-                              User executer = db.Users.FirstOrDefault(i => i.IdUser == chooseUser.User.IdUser);
-                              author.Authors.Add(new UserMission()
+                              if (chooseUser.Checkbox.Value)
                               {
-                                  Author = author, 
-                                  Executor = executer, 
-                                  Mission = model.Mission, 
-                                  Group = group,
-                                  Status =  STATUS.PENDING.ToString()
-                              });
+                                  User executer = _db.Users.FirstOrDefault(i => i.IdUser == chooseUser.User.IdUser);
+                                  author.Authors.Add(new UserMission()
+                                  {
+                                      Author = author, 
+                                      Executor = executer, 
+                                      Mission = model.Mission, 
+                                      Group = group,
+                                      Status =  Status.Pending.ToString()
+                                  });
+                              }
                           }
                       }
+                      await _db.SaveChangesAsync();
+                      return RedirectToAction("CreateMission", "Mission", ApplicationContext.IdCurrentGroup);
                   }
-                  await db.SaveChangesAsync();
-                  return RedirectToAction("ListGroups", "Group");
-                 
+                  catch (Exception e)
+                  {
+                      
+                  }
               }
-              return RedirectToAction("ListGroups", "Group");
+              return RedirectToAction("CreateMission", "Mission", ApplicationContext.IdCurrentGroup);
           }
           
           public IActionResult ListMissions()
           {
               var userName = User.Identity.Name;
-              User mainUser = db.Users.FirstOrDefault(i => i.Email == userName);
+              User mainUser = _db.Users.FirstOrDefault(i => i.Email == userName);
           
               
-              var executorsMissions = db.UserMissions
+              var executorsMissions = _db.UserMissions
                   .Include(c => c.Group)
                   .Include(c => c.Mission)
                   .Include(c => c.Author)
@@ -109,7 +115,7 @@ namespace Jodit.Controllers
                   .ToList();
               
               
-              var b = db.UserMissions
+              var b = _db.UserMissions
                   .Include(c => c.Group)
                   .Include(c => c.Mission)
                   .Include(c => c.Author)
@@ -124,8 +130,8 @@ namespace Jodit.Controllers
 
               MissionModel model = new MissionModel
               {
-                  authorsMissions = authorsMissions,
-                  executorsMissions = executorsMissions
+                  AuthorsMissions = authorsMissions,
+                  ExecutorsMissions = executorsMissions
               };
               
               return View(model);  
@@ -133,7 +139,7 @@ namespace Jodit.Controllers
           
           public IActionResult ListExecutors(int id)
           {
-              var a = db.UserMissions
+              var a = _db.UserMissions
                   .Include(c => c.Executor)
                   .Where(c => c.Mission.IdMission == id).ToList();
 
@@ -156,7 +162,7 @@ namespace Jodit.Controllers
           
           public IActionResult ListUserMissions(int id)
           {
-              var a = db.UserMissions
+              var a = _db.UserMissions
                   .Include(c => c.Executor)
                   .Where(c => c.Mission.IdMission == id).ToList();
               return View(a);
@@ -164,35 +170,35 @@ namespace Jodit.Controllers
           
           public async Task<IActionResult> RefuseMission(int idUserMission)
           {
-              var userMission = db.UserMissions.FirstOrDefault(a => a.IdUserMission == idUserMission);
-              userMission.Status = STATUS.REFUSE.ToString(); 
-              await db.SaveChangesAsync();
+              var userMission = _db.UserMissions.FirstOrDefault(a => a.IdUserMission == idUserMission);
+              userMission.Status = Status.Refuse.ToString(); 
+              await _db.SaveChangesAsync();
 
               return RedirectToAction("ListMissions", "Mission");
           }
           
           public async Task<IActionResult> PassMission(int idUserMission)
           {
-              var userMission = db.UserMissions.FirstOrDefault(a => a.IdUserMission == idUserMission);
-              userMission.Status = STATUS.PASS.ToString(); 
-              await db.SaveChangesAsync();
+              var userMission = _db.UserMissions.FirstOrDefault(a => a.IdUserMission == idUserMission);
+              userMission.Status = Status.Pass.ToString(); 
+              await _db.SaveChangesAsync();
 
               return RedirectToAction("ListMissions", "Mission");
           }
           
-          public async Task<IActionResult> deleteMission(int idUserMission)
+          public async Task<IActionResult> DeleteMission(int idUserMission)
           {
-              var userMission = db.UserMissions.FirstOrDefault(a => a.IdUserMission == idUserMission);
-              db.UserMissions.Remove(userMission);
-              await db.SaveChangesAsync();
+              var userMission = _db.UserMissions.FirstOrDefault(a => a.IdUserMission == idUserMission);
+              _db.UserMissions.Remove(userMission);
+              await _db.SaveChangesAsync();
               return RedirectToAction("ListMissions", "Mission");
           }
           
-          public async Task<IActionResult> returnMission(int idUserMission)
+          public async Task<IActionResult> ReturnMission(int idUserMission)
           {
-              var userMission = db.UserMissions.FirstOrDefault(a => a.IdUserMission == idUserMission);
-              userMission.Status = STATUS.TAKE.ToString(); 
-              await db.SaveChangesAsync();
+              var userMission = _db.UserMissions.FirstOrDefault(a => a.IdUserMission == idUserMission);
+              userMission.Status = Status.Take.ToString(); 
+              await _db.SaveChangesAsync();
               return RedirectToAction("ListMissions", "Mission");
           }
         
@@ -200,12 +206,12 @@ namespace Jodit.Controllers
           public async Task<IActionResult> TakeMission(int idUserMission)
           {
               var userName = User.Identity.Name;
-              User user = db.Users.FirstOrDefault(i => i.Email == userName);
-              var userMission = db.UserMissions
+              User user = _db.Users.FirstOrDefault(i => i.Email == userName);
+              var userMission = _db.UserMissions
                   .Include(x => x.Mission)
                   .FirstOrDefault(a => a.IdUserMission == idUserMission);
               
-              var a = db.UserMissions
+              var a = _db.UserMissions
                   .Include(c => c.Executor)
                   .Where(c => c.Mission.IdMission == userMission.Mission.IdMission).ToList();
               
@@ -213,10 +219,10 @@ namespace Jodit.Controllers
               var newList = a.Where(x=>x.Executor.IdUser != user.IdUser).ToList();
               foreach (var um in newList)
               {
-                  db.UserMissions.Remove(um);
+                  _db.UserMissions.Remove(um);
               }
-              userMission.Status = STATUS.TAKE.ToString(); 
-              await db.SaveChangesAsync();
+              userMission.Status = Status.Take.ToString(); 
+              await _db.SaveChangesAsync();
            
               return RedirectToAction("ListMissions", "Mission");
           }

@@ -14,9 +14,9 @@
     @Html.DropDownListFor(model => model.IdUser, ViewBag.Users as SelectList)
     <h3>Дежурит только в</h3>
     @{
-        foreach (var item in Model.daysOfTheWeek)
+        foreach (var item in Model.DaysOfTheWeek)
         {
-            <h4>@item.Key @Html.CheckBoxFor(x => x.daysOfTheWeek[item.Key])</h4> 
+            <h4>@item.Key @Html.CheckBoxFor(x => x.DaysOfTheWeek[item.Key])</h4> 
         }
     }
     

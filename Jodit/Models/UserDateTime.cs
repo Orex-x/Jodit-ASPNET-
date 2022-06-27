@@ -7,6 +7,6 @@ namespace Jodit.Models
 
         public User User { get; set; }
         public DateTime DateTime { get; set; }
-        public string userName { get; set; }
+        public string UserName { get; set; }
     }
 }

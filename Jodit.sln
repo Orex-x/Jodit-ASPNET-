@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jodit", "Jodit\Jodit.csproj", "{ED807930-9743-4D2A-A487-C5F8A9C36E80}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestsJodit", "UnitTestsJodit\UnitTestsJodit.csproj", "{30C31701-72AC-475A-B65E-DF276D48C229}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{ED807930-9743-4D2A-A487-C5F8A9C36E80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED807930-9743-4D2A-A487-C5F8A9C36E80}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED807930-9743-4D2A-A487-C5F8A9C36E80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30C31701-72AC-475A-B65E-DF276D48C229}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30C31701-72AC-475A-B65E-DF276D48C229}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30C31701-72AC-475A-B65E-DF276D48C229}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30C31701-72AC-475A-B65E-DF276D48C229}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

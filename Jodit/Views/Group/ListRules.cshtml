@@ -2,11 +2,11 @@
 
 @{
     Layout = "_GroupNavigationLayout";
-    ViewData["IdGroup"] = Model.idGroup;
+    ViewData["IdGroup"] = Model.IdGroup;
 }
 
 @{
-    foreach (var item in Model.list)
+    foreach (var item in Model.List)
     {
         <h2>Пользователь: @item.User.FirstName</h2>
         <h3>Дежурит только в следующие дни: </h3>

@@ -1,3 +1,4 @@
+using System;
 using Jodit.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -23,7 +24,10 @@ namespace Jodit
         {
             
             string connection = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(connection));
+            services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(connection, builder =>
+            {
+                builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            }), ServiceLifetime.Transient);
  
             // установка конфигурации подключения
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

@@ -4,6 +4,6 @@ namespace Jodit.ViewModels
 {
     public class AccountModel
     {
-        public User user;
+        public User User;
     }
 }

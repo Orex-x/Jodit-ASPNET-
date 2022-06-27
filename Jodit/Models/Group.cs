@@ -53,7 +53,7 @@ namespace Jodit.Models
                 return new UserDateTime()
                 {
                     User = after.BeforeUser,
-                    userName = after.BeforeUser.FirstName,
+                    UserName = after.BeforeUser.FirstName,
                     DateTime = date
                 };
             }
@@ -62,7 +62,7 @@ namespace Jodit.Models
                 return new UserDateTime()
                 {
                     User = after.AfterUser,
-                    userName = after.AfterUser.FirstName,
+                    UserName = after.AfterUser.FirstName,
                     DateTime = date
                 };
             }
@@ -71,7 +71,7 @@ namespace Jodit.Models
                 return new UserDateTime()
                 {
                     User = rule.User,
-                    userName = rule.User.FirstName,
+                    UserName = rule.User.FirstName,
                     DateTime = date
                 };
             }
@@ -104,7 +104,7 @@ namespace Jodit.Models
                 UserDateTime us = new UserDateTime()
                 {
                     User = u,
-                    userName = u.FirstName,
+                    UserName = u.FirstName,
                     DateTime = date
                 };
                 return us;
@@ -117,6 +117,7 @@ namespace Jodit.Models
         public List<UserDateTime> CreateSchedule(DateTime date)
         {
             var list = new List<UserDateTime>();
+            
             DateTime now = DateTime.Now.Date;
             
             
@@ -143,28 +144,28 @@ namespace Jodit.Models
                 
                 for (int i = 0; i < userList.Count; i++, now = now.AddDays(1))
                 {
-                    var a = ScheduleChanges
+                    var ScheduleChangeAfterUserDate = ScheduleChanges
                         .FirstOrDefault(x => x.AfterUserDate == now);
-                    var b = ScheduleChanges
+                    var ScheduleChangeBeforeUserDate = ScheduleChanges
                         .FirstOrDefault(x => x.BeforeUserDate == now);
                     
                     int indexDayOfWeek = (int) now.DayOfWeek;
                     var rule = Rules.FirstOrDefault(x => x.Days.Contains(indexDayOfWeek));
-                    if (a != null)
+                    if (ScheduleChangeAfterUserDate != null)
                     {
                         list.Add(new UserDateTime()
                         {
-                            User = a.BeforeUser,
-                            userName = a.BeforeUser.FirstName,
+                            User = ScheduleChangeAfterUserDate.BeforeUser,
+                            UserName = ScheduleChangeAfterUserDate.BeforeUser.FirstName,
                             DateTime = now
                         });
                     }
-                    else if (b != null)
+                    else if (ScheduleChangeBeforeUserDate != null)
                     {
                         list.Add(new UserDateTime()
                         {
-                            User = b.AfterUser,
-                            userName = b.AfterUser.FirstName,
+                            User = ScheduleChangeBeforeUserDate.AfterUser,
+                            UserName = ScheduleChangeBeforeUserDate.AfterUser.FirstName,
                             DateTime = now
                         });
                     }
@@ -175,7 +176,7 @@ namespace Jodit.Models
                             list.Add(new UserDateTime()
                             {
                                 User = rule.User,
-                                userName = rule.User.FirstName,
+                                UserName = rule.User.FirstName,
                                 DateTime = now
                             });
                             i--;
@@ -185,7 +186,7 @@ namespace Jodit.Models
                             list.Add(new UserDateTime()
                             {
                                 User = userList[i],
-                                userName = userList[i].FirstName,
+                                UserName = userList[i].FirstName,
                                 DateTime = now
                             });
                         }

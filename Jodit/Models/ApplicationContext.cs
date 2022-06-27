@@ -25,15 +25,15 @@ namespace Jodit.Models
         
         public DbSet<Rule> Rules { get; set; }
         
-        public DbSet<UserChatID> UserChatIds { get; set; }
+        public DbSet<UserChatId> UserChatIds { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options)
         {
             Database.EnsureCreated();
         }
         
-        public static int idCurrentGroup;
-        public static bool isAdmin;
+        public static int IdCurrentGroup;
+        public static bool IsAdmin;
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

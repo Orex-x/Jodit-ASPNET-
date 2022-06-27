@@ -9,7 +9,7 @@ namespace Jodit.ViewModels
         
         public int IdGroup { get; set; }
         
-        public Dictionary<string, Boolean> daysOfTheWeek { get; set; }
+        public Dictionary<string, Boolean> DaysOfTheWeek { get; set; }
         
     }
 }

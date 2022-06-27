@@ -1,18 +1,13 @@
 @model Jodit.Models.Group
-@{
-    ViewBag.Title = "User deletion";
-}
 
-<div>
+
+@*<div>
     <dl class="dl-horizontal">
-        <dt>Group name</dt>
+        <dt>Наименование Группы</dt>
         <dd>@Html.DisplayFor(model => model.GroupName)</dd>
 
-        <dt>Description</dt>
+        <dt>Описание</dt>
         <dd>@Html.DisplayFor(model => model.Description)</dd>
-
-        <dt>Is private</dt>
-        <dd>@Html.DisplayFor(model => model.IsPrivate)</dd>
     </dl>
 </div>
 
@@ -22,4 +17,26 @@
             <input type="submit" class="btn" value="Delete" />
         </div>
     </form>
-</div>
+</div>*@
+
+
+<section class="mt-5">
+    <div class="row ml-5 mb-4">
+        <div class="col-12">
+            <h2 class=" color1">Удаление группы</h2>
+        </div>
+    </div>
+   <form asp-action="delete" asp-controller="Group" method="post">
+        
+        <div class="form-group">
+            <label for="inputNameGroup">Наименование</label>
+            <input type="text" readonly="readonly" asp-for="GroupName" id="inputNameGroup"  class="form-control" placeholder="Наименование"/>
+        </div>
+        
+        <div class="form-group">
+            <label for="inputDescriptionGroup">Описание</label>
+            <textarea class="form-control" readonly="readonly" asp-for="Description" placeholder="Описание" id="inputDescriptionGroup" rows="3">@Model.Description</textarea>
+        </div>
+        <button class="btn btn-dark mt-4" type="submit">Удалить</button>
+    </form>
+</section>

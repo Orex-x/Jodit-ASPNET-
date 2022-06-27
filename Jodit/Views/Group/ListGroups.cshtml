@@ -28,48 +28,48 @@
           </thead>
           <tbody>
           @foreach(var userGroup in Model.UserGroups)
-                  {
-                      <tr>
-                          <td>
-                              @userGroup.Group.GroupName
-                          </td>
-                          <td>
-                              @userGroup.Group.Description
-                          </td>
-                          <td>
-                              <div class="row ml-4 my-3">
+          {
+              <tr>
+                  <td>
+                      @userGroup.Group.GroupName
+                  </td>
+                  <td>
+                      @userGroup.Group.Description
+                  </td>
+                  <td>
+                      <div class="row ml-4 my-3">
+                          <div class="col">
+                              <a asp-action="Details" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup">
+                                  <button class="btn btn-dark my-2">Открыть</button> 
+                              </a>
+                          </div>
+                          @{
+                              if (userGroup.IsAdmin)
+                              {
                                   <div class="col">
-                                      <a asp-action="Details" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup">
-                                          <button class="btn btn-dark my-2">Открыть</button> 
+                                      <a asp-action="Edit" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup" >
+                                          <button class="btn btn-outline-dark my-2">Изменить</button>
                                       </a>
                                   </div>
-                                  @{
-                                      if (userGroup.IsAdmin)
-                                      {
-                                          <div class="col">
-                                              <a asp-action="Edit" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup" >
-                                                  <button class="btn btn-outline-dark my-2">Изменить</button>
-                                              </a>
-                                          </div>
-                                          <div class="col">
-                                              <a asp-action="Delete" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup">
-                                                  <button class="btn btn-dark my-2">Удалить</button>
-                                              </a>
-                                          </div>
-                                      }
-                                      else
-                                      {
-                                          <div class="col">
-                                              <a asp-action="LeaveGroup" asp-controller="Group" asp-route-idUserGroup="@userGroup.IdUserGroup" >
-                                                  <button class="btn btn-dark my-2">Покинуть</button>
-                                              </a>
-                                          </div>
-                                      }
-                                 }
-                              </div>
-                          </td>
-                      </tr>
-                  }
+                                  <div class="col">
+                                      <a asp-action="Delete" asp-controller="Group" asp-route-id="@userGroup.Group.IdGroup">
+                                          <button class="btn btn-dark my-2">Удалить</button>
+                                      </a>
+                                  </div>
+                              }
+                              else
+                              {
+                                  <div class="col">
+                                      <a asp-action="LeaveGroup" asp-controller="Group" asp-route-idUserGroup="@userGroup.IdUserGroup" >
+                                          <button class="btn btn-dark my-2">Покинуть</button>
+                                      </a>
+                                  </div>
+                              }
+                          }
+                      </div>
+                  </td>
+              </tr>
+          }
           </tbody>
-        </table>
+</table> 
 

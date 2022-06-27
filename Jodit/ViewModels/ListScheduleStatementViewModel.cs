@@ -5,6 +5,6 @@ namespace Jodit.ViewModels;
 
 public class ListScheduleStatementViewModel
 {
-    public List<ScheduleStatement> list { get; set; }
-    public int groupId { get; set; }
+    public List<ScheduleStatement> List { get; set; }
+    public int GroupId { get; set; }
 }

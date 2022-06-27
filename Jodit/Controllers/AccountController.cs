@@ -15,10 +15,10 @@ namespace Jodit.Controllers
 {
     public class AccountController : Controller
     {
-        private ApplicationContext db;
+        private ApplicationContext _db;
         public AccountController(ApplicationContext context)
         {
-            db = context;
+            _db = context;
         }
         
         
@@ -37,7 +37,7 @@ namespace Jodit.Controllers
        {
            if (ModelState.IsValid)
            {
-               User findUser =  db.Users.FirstOrDefault(u => u.Email == model.Email);
+               User findUser =  _db.Users.FirstOrDefault(u => u.Email == model.Email);
                 
                if (findUser == null)
                {
@@ -57,8 +57,8 @@ namespace Jodit.Controllers
                        await Authenticate(user.Email);
                    
                    
-                       db.Users.Add(user);
-                       db.SaveChanges();
+                       _db.Users.Add(user);
+                       _db.SaveChanges();
                        return RedirectToAction("Account", "Account");
                    } 
                    ModelState.AddModelError("", "Пароль должен содержать минимум 8 символов");
@@ -73,12 +73,12 @@ namespace Jodit.Controllers
        {
            if (ModelState.IsValid)
            {
-               User user =  db.Users.FirstOrDefault(u => u.Email == model.Email);
+               User user =  _db.Users.FirstOrDefault(u => u.Email == model.Email);
                if (user != null)
                {
                    var hasher = new PasswordHasher<User>();
-                   var s = hasher.
-                        VerifyHashedPassword(user, user.UserPassword, model.Password);
+                   var s = hasher
+                       .VerifyHashedPassword(user, user.UserPassword, model.Password);
                    
                     if (s == PasswordVerificationResult.Success)
                     {
@@ -115,14 +115,14 @@ namespace Jodit.Controllers
         public IActionResult Account()
         {
             var userName = User.Identity.Name;
-            User user = db.Users
+            User user = _db.Users
                 .Include(x => x.UserGroups)
                 .ThenInclude(x => x.Group)
                 .FirstOrDefault(u => u.Email == userName);
                 
             AccountModel model = new AccountModel()
             {
-                user = user
+                User = user
             };
             return View(model);
         }
@@ -131,10 +131,10 @@ namespace Jodit.Controllers
         public IActionResult GroupInvitations()
         { 
             var userName = User.Identity.Name;
-            User user = db.Users.FirstOrDefault(u => u.Email == userName);
+            User user = _db.Users.FirstOrDefault(u => u.Email == userName);
             
            
-           var groupInvites = db.GroupInvites
+           var groupInvites = _db.GroupInvites
                .Include(u => u.Group)  // подгружаем данные по группам
                .Include(c => c.InvitingUser)
                .Where(c => c.InvitedUser.IdUser == user.IdUser) 
@@ -147,7 +147,7 @@ namespace Jodit.Controllers
         [Authorize]
         public async Task<IActionResult> AcceptGroupInvitations(int idGroupInvitations)
         {
-            GroupInvite groupInvite = db.GroupInvites
+            GroupInvite groupInvite = _db.GroupInvites
                 .Include(x => x.Group)
                 .Include(x => x.InvitingUser)
                 .Include(x => x.InvitedUser)
@@ -161,8 +161,8 @@ namespace Jodit.Controllers
                     IsAdmin = false, 
                     User = groupInvite.InvitedUser
                 });
-                db.GroupInvites.Remove(groupInvite);
-                db.SaveChanges();
+                _db.GroupInvites.Remove(groupInvite);
+                _db.SaveChanges();
             }
             
             return RedirectToAction("GroupInvitations", "Account");
@@ -171,7 +171,7 @@ namespace Jodit.Controllers
         [Authorize]
         public async Task<IActionResult> RefuseGroupInvitations(int idGroupInvitations)
         {
-            GroupInvite groupInvite = db.GroupInvites
+            GroupInvite groupInvite = _db.GroupInvites
                 .Include(x => x.Group)
                 .Include(x => x.InvitingUser)
                 .Include(x => x.InvitedUser)
@@ -179,8 +179,8 @@ namespace Jodit.Controllers
            
             if (groupInvite != null)
             {
-                db.GroupInvites.Remove(groupInvite);
-                db.SaveChangesAsync();
+                _db.GroupInvites.Remove(groupInvite);
+                _db.SaveChangesAsync();
             }
             return RedirectToAction("GroupInvitations", "Account");
         }

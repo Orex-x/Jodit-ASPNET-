@@ -21,7 +21,7 @@
             </div>
             <div class="list-group m-4">
                 @{
-                    if (ApplicationContext.isAdmin)
+                    if (ApplicationContext.IsAdmin)
                     {
                         <a asp-action="CreateMission" asp-route-id="@ViewData["IdGroup"]" asp-controller="Mission" class="list-group-item list-group-item-action">Создать задачу</a>
                         <a asp-action="CreateRule" asp-controller="Group" asp-route-id="@ViewData["IdGroup"]" class="list-group-item list-group-item-action">Создать правило</a>

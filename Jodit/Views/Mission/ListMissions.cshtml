@@ -20,9 +20,9 @@
     </tr>
     </thead>
     <tbody>
-    @foreach(var userMission in Model.executorsMissions)
+    @foreach(var userMission in Model.ExecutorsMissions)
     {
-        @if (userMission.Status.Equals(MissionController.STATUS.PENDING.ToString()))
+        @if (userMission.Status.Equals(MissionController.Status.Pending.ToString()))
         {
             <tr>
                 <td>
@@ -57,9 +57,9 @@
         }
     }
     
-    @foreach(var userMission in Model.executorsMissions)
+    @foreach(var userMission in Model.ExecutorsMissions)
     {
-        @if (userMission.Status.Equals(MissionController.STATUS.TAKE.ToString()))
+        @if (userMission.Status.Equals(MissionController.Status.Take.ToString()))
         {
             <tr>
                 <td>
@@ -93,7 +93,7 @@
         }
     }
     
-    @foreach (var userMission in Model.authorsMissions)
+    @foreach (var userMission in Model.AuthorsMissions)
     {
         <tr>
             <td>
@@ -107,22 +107,22 @@
             </td>
             <td>
              <div class="row ml-4 my-3">
-                @if (userMission.Status.Equals(MissionController.STATUS.PASS.ToString()))
+                @if (userMission.Status.Equals(MissionController.Status.Pass.ToString()))
                 {
                     <div class="col">
-                        <a asp-action="deleteMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">
+                        <a asp-action="DeleteMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">
                             <button class="btn btn-dark my-2">Принять</button> 
                         </a>
                     </div>
                     <div class="col">
-                        <a asp-action="returnMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">
+                        <a asp-action="ReturnMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">
                             <button class="btn btn-dark my-2">Вернуть</button> 
                         </a>
                     </div>
                    
                 }
                 <div class="col">
-                    <a asp-action="deleteMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">
+                    <a asp-action="DeleteMission" asp-route-idUserMission="@userMission.IdUserMission" asp-controller="Mission">
                         <button class="btn btn-dark my-2">Удалить</button> 
                     </a>
                 </div>

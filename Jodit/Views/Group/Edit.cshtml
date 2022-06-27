@@ -1,11 +1,32 @@
 @model Jodit.Models.Group
 
-@{
-    ViewData["Title"] = "Edit";
-}
 
-<h1>Edit</h1>
+<section class="mt-5">
+    <div class="row ml-5 mb-4">
+        <div class="col-12">
+            <h2 class=" color1">Изменение группы</h2>
+        </div>
+    </div>
+    <form asp-action="Edit" asp-controller="Group" asp-route-id="@Model.IdGroup">
+        <input type="hidden" asp-for="IdGroup" />
+        
+        
+        <div class="form-group">
+            <label for="inputNameGroup">Наименование</label>
+            <input type="text" asp-for="GroupName" id="inputNameGroup" class="form-control" placeholder="Наименование"/>
+        </div>
+        
+        <div class="form-group">
+            <label for="inputDescriptionGroup">Описание</label>
+            <textarea class="form-control" asp-for="Description" placeholder="Описание" id="inputDescriptionGroup" rows="3"></textarea>
+        </div>
+        
+        
+        <button class="btn btn-dark mt-4" type="submit">Изменить</button>
+    </form>
+</section>
 
+@*
 <form asp-action="Edit" asp-controller="group" asp-route-id="@Model.IdGroup">
     <input type="hidden" asp-for="IdGroup" />
     <div class="form-group">
@@ -33,3 +54,4 @@
         <input type="submit" value="Create" class="btn btn-default">
     </div>
 </form>
+*@

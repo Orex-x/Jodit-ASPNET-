@@ -7,9 +7,9 @@ namespace Jodit.ViewModels
     {
         public Mission Mission { get; set; }
         
-        public List<UserMission> executorsMissions { get; set; }
+        public List<UserMission> ExecutorsMissions { get; set; }
         
-        public List<UserMission> authorsMissions { get; set; }
+        public List<UserMission> AuthorsMissions { get; set; }
 
         public List<ChooseUser> ChooseUsers { get; set; }
 
